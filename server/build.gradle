@@ -1,0 +1,65 @@
+group 'com.catinthedark.squtality'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.0.3'
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = 'io.vertx.core.Launcher'
+
+shadowJar {
+    classifier = 'fat'
+    manifest {
+        attributes 'Main-Verticle': 'com.catinthedark.squatality.server.MainVerticle'
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir "src/main/kotlin"
+        }
+    }
+    test {
+        kotlin {
+            srcDir "test/main/kotlin"
+        }
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "io.vertx:vertx-core:3.3.2"
+    compile "com.corundumstudio.socketio:netty-socketio:1.7.10"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+//Special for heroku
+task stage(type: Copy, dependsOn: [clean, shadowJar]) {
+    from "${shadowJar.archivePath}"
+    into project.rootDir
+    rename {
+        'app.jar'
+    }
+}
+
+stage.mustRunAfter(clean)
+clean << {
+    project.file('app.jar').delete()
+}

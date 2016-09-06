@@ -1,0 +1,7 @@
+version: '2'
+services:
+  server:
+    image: openjdk:8-jre-alpine
+    volumes:
+      - ./app.jar:/app/app.jar:ro
+    command: java -jar /app/app.jar
