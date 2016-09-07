@@ -1,6 +1,12 @@
 package com.catinthedark.squatality.server
 
+import com.catinthedark.lib.IMessage
+import com.catinthedark.models.GameStartedMessage
+import com.catinthedark.models.HelloMessage
+import com.catinthedark.models.MoveMessage
+import com.catinthedark.models.ThrowBrickMessage
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.eventbus.DeliveryOptions
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
@@ -14,7 +20,9 @@ class RoomVerticle: AbstractVerticle() {
         id = UUID.fromString(config().getString("uuid"))!!
         logger.info("Room started $id")
 
-        vertx.eventBus().consumer<JsonObject>(Addressing.onMove(id), {moveHandler(it)})
+        vertx.eventBus().consumer<MoveMessage>(Addressing.onMove(id), {moveHandler(it)})
+        vertx.eventBus().consumer<HelloMessage>(Addressing.onHello(id), {helloHandler(it)})
+        vertx.eventBus().consumer<ThrowBrickMessage>(Addressing.onThrowBrick(id), {throwBrickHandler(it)})
         vertx.eventBus().consumer<JsonObject>(Addressing.onConnect(id), {connectHandler(it)})
         vertx.eventBus().consumer<JsonObject>(Addressing.onDisconnect(id), {disconnectHandler(it)})
         vertx.eventBus().consumer<Long>(Addressing.onTick(), {tickHandler(it)})
@@ -24,8 +32,23 @@ class RoomVerticle: AbstractVerticle() {
         logger.info("Room stopped")
     }
 
+    private fun helloHandler(msg: Message<HelloMessage>) {
+        logger.info("Room-$id helloHandler: ${msg.body()}")
+        val clientID = clientFromHeaders(msg)
+        sendToClient(Addressing.onGameStarted(), GameStartedMessage(clientID), clientID)
+    }
+
+    private fun throwBrickHandler(msg: Message<ThrowBrickMessage>) {
+        logger.info("Room-$id throwBrickHandler: ${msg.body()}")
+        val clientID = clientFromHeaders(msg)
+    }
+
+    private fun moveHandler(msg: Message<MoveMessage>) {
+        logger.info("Room-$id moveHandler: ${msg.body()}")
+        val clientID = clientFromHeaders(msg)
+    }
+
     private fun tickHandler(time: Message<Long>) {
-        logger.info("Room-$id onTick: ${time.body()}")
     }
 
     private fun connectHandler(msg: Message<JsonObject>) {
@@ -37,7 +60,13 @@ class RoomVerticle: AbstractVerticle() {
         vertx.undeploy(deploymentID()) // TODO: example!
     }
 
-    private fun moveHandler(msg: Message<JsonObject>) {
-        logger.info("Room-$id moveHandler: $msg")
+    private fun <T: IMessage> clientFromHeaders(msg: Message<T>): UUID {
+        return UUID.fromString(msg.headers()[headerClientID]!!)
+    }
+
+    private fun <T: IMessage> sendToClient(address: String, msg: T, clientID: UUID) {
+        val options = DeliveryOptions()
+        options.addHeader(headerClientID, clientID.toString())
+        vertx.eventBus().send(address, msg, options)
     }
 }
