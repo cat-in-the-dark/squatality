@@ -1,0 +1,62 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
+def gitCommitCount =
+        Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+
+buildscript {
+    ext.kotlin_version = '1.0.3'
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:2.2.0-rc1'
+    }
+}
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
+    productFlavors {
+        dev {
+            minSdkVersion 23 // To reduce compilation time
+        }
+        prod {
+            minSdkVersion 15
+        }
+    }
+    defaultConfig {
+        applicationId "com.catinthedark.squatality.android"
+        minSdkVersion 15
+        targetSdkVersion 24
+        versionCode gitCommitCount
+        versionName "$gitCommitCount"
+        archivesBaseName = "squatality-$versionCode"
+        buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    testCompile 'junit:junit:4.12'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.android.support:multidex:1.0.1"
+    androidTestCompile "com.android.support:multidex-instrumentation:1.0.1", {
+        exclude module: 'multidex'
+    }
+}

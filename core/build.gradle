@@ -15,19 +15,6 @@ apply plugin: 'kotlin'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-sourceSets {
-    main {
-        kotlin {
-            srcDir "src/main/kotlin"
-        }
-    }
-    test {
-        kotlin {
-            srcDir "test/main/kotlin"
-        }
-    }
-}
-
 dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.7.5'
