@@ -2,6 +2,10 @@ package com.catinthedark.squatality.server
 
 import java.util.*
 
+/**
+ * By convention all addresses should be functions!
+ * Functions can be applied on some data to implement dynamic messageBus routing.
+ */
 object Addressing {
     fun onMove(roomID: UUID) = "room-$roomID.onMove"
     fun onHello(roomID: UUID) = "room-$roomID.onHello"

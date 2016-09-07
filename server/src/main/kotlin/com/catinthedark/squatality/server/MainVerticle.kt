@@ -8,6 +8,7 @@ class MainVerticle: AbstractVerticle() {
     val logger = LoggerFactory.getLogger(MainVerticle::class.java)!!
 
     override fun start() {
+        logger.info("MainVerticle started")
         vertx.deployVerticle(SocketIOVerticle())
     }
 }

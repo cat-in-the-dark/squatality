@@ -45,14 +45,13 @@ class SocketIOVerticle: AbstractVerticle() {
         val roomID = clientsInRoom[client.sessionId]
         if (roomID != null) {
             clientsInRoom.remove(roomID)
-            vertx.eventBus().send(Addressing.onDisconnect(roomID), JsonObject())
+            vertx.eventBus().send(Addressing.onDisconnect(roomID), client.sessionId)
         }
     }
 
     private val messageHandler = DataListener<String> { client, data, ackRequest ->
         try {
             val msg = MessageConverter.parser.unwrap(data)
-            logger.info(msg)
             val roomID = clientsInRoom[client.sessionId]
             if (roomID != null) {
                 val options = DeliveryOptions()
@@ -71,6 +70,10 @@ class SocketIOVerticle: AbstractVerticle() {
         }
     }
 
+    /**
+     * Syntax sugar over sendEvent.
+     * So you don't have to call MessageConverter manually!!!
+     */
     fun SocketIOClient.push(msg: IMessage) {
         sendEvent(eventName, MessageConverter.parser.wrap(msg))
     }
@@ -87,6 +90,21 @@ class SocketIOVerticle: AbstractVerticle() {
                 logger.error("Can't start server", it.cause())
             }
         }
+
+        registerReverseHandler()
+        var lastTick = System.nanoTime()
+        vertx.setPeriodic(tickDelay, {
+            val currentTime = System.nanoTime()
+            vertx.eventBus().publish(Addressing.onTick(), (currentTime - lastTick) / 1000000)
+            lastTick = currentTime
+        })
+    }
+
+    /**
+     * This handlers will be called from RoomVerticle.
+     * We need this to make RoomVerticle unaware of socketIO system.
+     */
+    private fun registerReverseHandler() {
         vertx.eventBus().consumer<GameStartedMessage>(Addressing.onGameStarted(), {
             val clientID = UUID.fromString(it.headers()[headerClientID])
             server.getClient(clientID).push(it.body()!!)
@@ -94,9 +112,6 @@ class SocketIOVerticle: AbstractVerticle() {
         vertx.eventBus().consumer<GameStateMessage>(Addressing.onGameState(), {
             val clientID = UUID.fromString(it.headers()[headerClientID])
             server.getClient(clientID).push(it.body()!!)
-        })
-        vertx.setPeriodic(tickDelay, {
-            vertx.eventBus().publish(Addressing.onTick(), System.nanoTime())
         })
     }
 

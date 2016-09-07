@@ -1,5 +1,6 @@
 package com.catinthedark.squatality.server
 
+import com.catinthedark.lib.IMessage
 import com.catinthedark.models.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -7,9 +8,18 @@ import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.EventBus
 import io.vertx.core.eventbus.MessageCodec
 
-abstract class RoomMessageCodec<M> : MessageCodec<M, M>  {
+/**
+ * I apologize for all this stuff.
+ * We decided to use statically typed messages in vertex eventBus
+ * so we have to declare all this dumb codecs
+ *
+ * About out boundaries. I specify that this codec works only and only with IMessage.
+ * This is the way of avoiding strange errors.
+ */
+class RoomMessageCodec<M: IMessage>(
+    val clazz: Class<M>
+) : MessageCodec<M, M>  {
     val mapper = ObjectMapper().registerKotlinModule()
-    abstract val clazz: Class<M>
 
     override fun decodeFromWire(pos: Int, buffer: Buffer): M {
         val size = buffer.getInt(pos)
@@ -29,19 +39,21 @@ abstract class RoomMessageCodec<M> : MessageCodec<M, M>  {
 
     override fun systemCodecID(): Byte = -1
 
-    override fun name(): String = this.javaClass.canonicalName
+    override fun name(): String = "${this.javaClass.canonicalName}-$clazz"
 }
 
-class HelloMessageCodec(override val clazz: Class<HelloMessage> = HelloMessage::class.java) : RoomMessageCodec<HelloMessage>()
-class MoveMessageCodec(override val clazz: Class<MoveMessage> = MoveMessage::class.java) : RoomMessageCodec<MoveMessage>()
-class ThrowBrickMessageCodec(override val clazz: Class<ThrowBrickMessage> = ThrowBrickMessage::class.java) : RoomMessageCodec<ThrowBrickMessage>()
-class GameStartedMessageCodec(override val clazz: Class<GameStartedMessage> = GameStartedMessage::class.java) : RoomMessageCodec<GameStartedMessage>()
-class GameStateMessageCodec(override val clazz: Class<GameStateMessage> = GameStateMessage::class.java) : RoomMessageCodec<GameStateMessage>()
-
+/**
+ * This is the place where new messages should be connected.
+ * Don't forget to call this method in the very vertx's initialization process.
+ */
 fun registerCodecs(bus: EventBus) {
-    bus.registerDefaultCodec(HelloMessage::class.java, HelloMessageCodec())
-    bus.registerDefaultCodec(MoveMessage::class.java, MoveMessageCodec())
-    bus.registerDefaultCodec(ThrowBrickMessage::class.java, ThrowBrickMessageCodec())
-    bus.registerDefaultCodec(GameStartedMessage::class.java, GameStartedMessageCodec())
-    bus.registerDefaultCodec(GameStateMessage::class.java, GameStateMessageCodec())
+    bus.registerDefaultCodec(EnemyDisconnectedMessage::class.java, RoomMessageCodec(EnemyDisconnectedMessage::class.java))
+    bus.registerDefaultCodec(GameStartedMessage::class.java, RoomMessageCodec(GameStartedMessage::class.java))
+    bus.registerDefaultCodec(RoundEndsMessage::class.java, RoomMessageCodec(RoundEndsMessage::class.java))
+    bus.registerDefaultCodec(HelloMessage::class.java, RoomMessageCodec(HelloMessage::class.java))
+    bus.registerDefaultCodec(ServerHelloMessage::class.java, RoomMessageCodec(ServerHelloMessage::class.java))
+    bus.registerDefaultCodec(MoveMessage::class.java, RoomMessageCodec(MoveMessage::class.java))
+    bus.registerDefaultCodec(GameStateMessage::class.java, RoomMessageCodec(GameStateMessage::class.java))
+    bus.registerDefaultCodec(SoundMessage::class.java, RoomMessageCodec(SoundMessage::class.java))
+    bus.registerDefaultCodec(ThrowBrickMessage::class.java, RoomMessageCodec(ThrowBrickMessage::class.java))
 }
