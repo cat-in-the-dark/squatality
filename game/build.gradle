@@ -1,4 +1,4 @@
-group 'com.catinthedark'
+group 'com.catinthedark.squtality'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'idea'
@@ -9,8 +9,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
-    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.7.5'
+    compile project(":lib")
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
