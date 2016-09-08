@@ -1,5 +1,7 @@
 package com.catinthedark.squatality.server
 
+import com.catinthedark.Const
+import com.catinthedark.lib.IExecutor
 import com.catinthedark.lib.IMessage
 import com.catinthedark.models.*
 import io.vertx.core.AbstractVerticle
@@ -7,6 +9,7 @@ import io.vertx.core.eventbus.DeliveryOptions
 import io.vertx.core.eventbus.Message
 import io.vertx.core.logging.LoggerFactory
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * This class is central handler for all room-specific messages coming from clients.
@@ -17,18 +20,24 @@ import java.util.*
 class RoomVerticle: AbstractVerticle() {
     private val logger = LoggerFactory.getLogger(RoomVerticle::class.java)!!
     lateinit var id: UUID
+    private lateinit var executor: IExecutor
     private lateinit var service: RoomService
 
     override fun start() {
         id = UUID.fromString(config().getString("uuid"))!!
         logger.info("Room-$id started")
-        service = RoomService()
+        executor = VertxExecutor(vertx)
+        service = RoomService(executor)
 
-        vertx.eventBus().consumer<MoveMessage>(Addressing.onMove(id), {moveHandler(it)})
-        vertx.eventBus().consumer<HelloMessage>(Addressing.onHello(id), {helloHandler(it)})
-        vertx.eventBus().consumer<ThrowBrickMessage>(Addressing.onThrowBrick(id), {throwBrickHandler(it)})
-        vertx.eventBus().consumer<String>(Addressing.onDisconnect(id), {disconnectHandler(it)})
-        vertx.eventBus().consumer<Long>(Addressing.onTick(), {tickHandler(it)})
+        vertx.eventBus().localConsumer<MoveMessage>(Addressing.onMove(id), {moveHandler(it)})
+        vertx.eventBus().localConsumer<HelloMessage>(Addressing.onHello(id), {helloHandler(it)})
+        vertx.eventBus().localConsumer<ThrowBrickMessage>(Addressing.onThrowBrick(id), {throwBrickHandler(it)})
+        vertx.eventBus().localConsumer<String>(Addressing.onDisconnect(id), {disconnectHandler(it)})
+        vertx.eventBus().localConsumer<Long>(Addressing.onTick(), {tickHandler(it)})
+
+        executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
+            service.onSpawnBonus()
+        })
     }
 
     override fun stop() {
@@ -56,12 +65,10 @@ class RoomVerticle: AbstractVerticle() {
 
     private fun tickHandler(msg: Message<Long>) {
         val delta = msg.body() ?: return
-        val state = service.onTick(delta)
-        if (state != null) {
-            val gmm = GameStateMessage(state)
-            service.clientsIDs.forEach {
-                sendToClient(Addressing.onGameState(), gmm, it)
-            }
+        val states = service.onTick(delta)
+        states.forEach { state ->
+            val gmm = GameStateMessage(state.second)
+            sendToClient(Addressing.onGameState(), gmm, state.first)
         }
     }
 

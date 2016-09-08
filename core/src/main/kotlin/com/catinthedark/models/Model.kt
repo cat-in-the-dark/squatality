@@ -29,7 +29,7 @@ data class BrickModel(
     val id: UUID,
     var x: Float,
     var y: Float,
-    var angle: Float,
+    var angle: Double,
     var hurting: Boolean) : Model
 
 data class BonusModel(

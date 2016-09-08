@@ -10,5 +10,5 @@ data class HelloMessage(val name: String) : IMessage
 data class ServerHelloMessage(val clientId: UUID) : IMessage
 data class MoveMessage(val speedX: Float, val speedY: Float, val angle: Float, val stateName: String) : IMessage
 data class GameStateMessage(val gameStateModel: GameStateModel) : IMessage
-data class SoundMessage(val soundName: String) : IMessage
-data class ThrowBrickMessage(val x: Float, val y: Float, val force: Float, val angle: Float) : IMessage
+data class SoundMessage(val soundName: SoundName) : IMessage
+data class ThrowBrickMessage(val x: Float, val y: Float, val force: Float, val angle: Double) : IMessage

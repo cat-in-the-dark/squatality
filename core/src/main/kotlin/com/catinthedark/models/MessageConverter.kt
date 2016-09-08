@@ -6,6 +6,7 @@ import com.catinthedark.lib.Register
 
 object MessageConverter {
     private val converter = JsonConverter()
+
     init {
         registerMessages(converter)
     }

@@ -16,7 +16,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import java.util.*
 
-class SocketIOVerticle: AbstractVerticle() {
+class SocketIOVerticle : AbstractVerticle() {
     val logger = LoggerFactory.getLogger(SocketIOVerticle::class.java)!!
     val config: Configuration
     val server: SocketIOServer
@@ -31,14 +31,21 @@ class SocketIOVerticle: AbstractVerticle() {
         server = SocketIOServer(config)
     }
 
+    private fun findOrCreateRoom(): UUID {
+        val rooms = clientsInRoom.values.toSet()
+        if (rooms.size < 1) {
+            val roomID = UUID.randomUUID()
+            val roomConfig = JsonObject().put("uuid", roomID.toString())
+            val roomOptions = DeploymentOptions().setConfig(roomConfig)
+            vertx.deployVerticle(RoomVerticle(), roomOptions)
+            return roomID
+        } else {
+            return rooms.first()
+        }
+    }
+
     private val connectHandler = ConnectListener { client ->
-        val roomID = UUID.randomUUID()
-        clientsInRoom[client.sessionId] = roomID
-
-        val roomConfig = JsonObject().put("uuid", roomID.toString())
-        val roomOptions = DeploymentOptions().setConfig(roomConfig)
-        vertx.deployVerticle(RoomVerticle(), roomOptions)
-
+        clientsInRoom[client.sessionId] = findOrCreateRoom()
         push(client, ServerHelloMessage(client.sessionId))
     }
 
@@ -111,17 +118,17 @@ class SocketIOVerticle: AbstractVerticle() {
      * We need this to make RoomVerticle unaware of socketIO system.
      */
     private fun registerReverseHandler() {
-        vertx.eventBus().consumer<GameStartedMessage>(Addressing.onGameStarted(), {
+        vertx.eventBus().localConsumer<GameStartedMessage>(Addressing.onGameStarted(), {
             val clientID = clientFromHeaders(it)
             push(server.getClient(clientID), it.body())
         })
-        vertx.eventBus().consumer<GameStateMessage>(Addressing.onGameState(), {
+        vertx.eventBus().localConsumer<GameStateMessage>(Addressing.onGameState(), {
             val clientID = clientFromHeaders(it)
             push(server.getClient(clientID), it.body())
         })
     }
 
-    private fun <T: IMessage> clientFromHeaders(msg: Message<T>): UUID? {
+    private fun <T : IMessage> clientFromHeaders(msg: Message<T>): UUID? {
         val id = msg.headers().get(headerClientID) ?: return null
         return UUID.fromString(id)
     }
