@@ -11,6 +11,7 @@ import com.corundumstudio.socketio.listener.DisconnectListener
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.eventbus.DeliveryOptions
+import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import java.util.*
@@ -38,14 +39,14 @@ class SocketIOVerticle: AbstractVerticle() {
         val roomOptions = DeploymentOptions().setConfig(roomConfig)
         vertx.deployVerticle(RoomVerticle(), roomOptions)
 
-        client.push(ServerHelloMessage(client.sessionId))
+        push(client, ServerHelloMessage(client.sessionId))
     }
 
     private val disconnectHandler = DisconnectListener { client ->
         val roomID = clientsInRoom[client.sessionId]
         if (roomID != null) {
             clientsInRoom.remove(roomID)
-            vertx.eventBus().send(Addressing.onDisconnect(roomID), client.sessionId)
+            vertx.eventBus().send(Addressing.onDisconnect(roomID), client.sessionId.toString())
         }
     }
 
@@ -74,8 +75,13 @@ class SocketIOVerticle: AbstractVerticle() {
      * Syntax sugar over sendEvent.
      * So you don't have to call MessageConverter manually!!!
      */
-    fun SocketIOClient.push(msg: IMessage) {
-        sendEvent(eventName, MessageConverter.parser.wrap(msg))
+    fun push(client: SocketIOClient?, msg: IMessage?) {
+        if (msg == null) return
+        if (client == null) {
+            logger.warn("SocketIOClient is null")
+            return
+        }
+        client.sendEvent(eventName, MessageConverter.parser.wrap(msg))
     }
 
     override fun start() {
@@ -106,13 +112,18 @@ class SocketIOVerticle: AbstractVerticle() {
      */
     private fun registerReverseHandler() {
         vertx.eventBus().consumer<GameStartedMessage>(Addressing.onGameStarted(), {
-            val clientID = UUID.fromString(it.headers()[headerClientID])
-            server.getClient(clientID).push(it.body()!!)
+            val clientID = clientFromHeaders(it)
+            push(server.getClient(clientID), it.body())
         })
         vertx.eventBus().consumer<GameStateMessage>(Addressing.onGameState(), {
-            val clientID = UUID.fromString(it.headers()[headerClientID])
-            server.getClient(clientID).push(it.body()!!)
+            val clientID = clientFromHeaders(it)
+            push(server.getClient(clientID), it.body())
         })
+    }
+
+    private fun <T: IMessage> clientFromHeaders(msg: Message<T>): UUID? {
+        val id = msg.headers().get(headerClientID) ?: return null
+        return UUID.fromString(id)
     }
 
     override fun stop() {

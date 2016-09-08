@@ -18,12 +18,12 @@ data class PlayerModel(
     var x: Float,
     var y: Float,
     var angle: Float,
-    var state: String,
+    var state: State,
     var skin: String,
-    var bonuses: MutableList<String>,
-    var frags: Int,
-    var deaths: Int,
-    var hasBrick: Boolean) : Model
+    val bonuses: MutableList<String> = arrayListOf(),
+    var frags: Int = 0,
+    var deaths: Int = 0,
+    var hasBrick: Boolean = false) : Model
 
 data class BrickModel(
     val id: UUID,

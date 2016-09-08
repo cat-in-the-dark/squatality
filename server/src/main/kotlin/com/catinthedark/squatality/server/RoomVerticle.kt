@@ -1,10 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IMessage
-import com.catinthedark.models.GameStartedMessage
-import com.catinthedark.models.HelloMessage
-import com.catinthedark.models.MoveMessage
-import com.catinthedark.models.ThrowBrickMessage
+import com.catinthedark.models.*
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.eventbus.DeliveryOptions
 import io.vertx.core.eventbus.Message
@@ -39,36 +36,50 @@ class RoomVerticle: AbstractVerticle() {
     }
 
     private fun helloHandler(msg: Message<HelloMessage>) {
-        val clientID = clientFromHeaders(msg)
-        service.onNewClient(msg.body()!!, clientID)
+        val clientID = clientFromHeaders(msg) ?: return
+        val body = msg.body() ?: return
+        service.onNewClient(body, clientID)
         sendToClient(Addressing.onGameStarted(), GameStartedMessage(clientID), clientID)
     }
 
     private fun throwBrickHandler(msg: Message<ThrowBrickMessage>) {
-        val clientID = clientFromHeaders(msg)
-        service.onThrowBrick(msg.body()!!, clientID)
+        val clientID = clientFromHeaders(msg) ?: return
+        val body = msg.body() ?: return
+        service.onThrowBrick(body, clientID)
     }
 
     private fun moveHandler(msg: Message<MoveMessage>) {
-        val clientID = clientFromHeaders(msg)
-        service.onMove(msg.body()!!, clientID)
+        val clientID = clientFromHeaders(msg) ?: return
+        val body = msg.body() ?: return
+        service.onMove(body, clientID)
     }
 
-    private fun tickHandler(delta: Message<Long>) {
-        service.onTick(delta.body())
+    private fun tickHandler(msg: Message<Long>) {
+        val delta = msg.body() ?: return
+        val state = service.onTick(delta)
+        if (state != null) {
+            val gmm = GameStateMessage(state)
+            service.clientsIDs.forEach {
+                sendToClient(Addressing.onGameState(), gmm, it)
+            }
+        }
     }
 
     private fun disconnectHandler(msg: Message<String>) {
         logger.info("Room-$id onDisconnect: ${msg.body()}")
-        val clientID = UUID.fromString(msg.body() ?: return)
-        service.onDisconnect(clientID)
+        val uuid: String? = msg.body()
+        if (uuid != null) {
+            val clientID = UUID.fromString(uuid)
+            service.onDisconnect(clientID)
+        }
         if (service.shouldStop()) {
             vertx.undeploy(deploymentID())
         }
     }
 
-    private fun <T: IMessage> clientFromHeaders(msg: Message<T>): UUID {
-        return UUID.fromString(msg.headers()[headerClientID]!!)
+    private fun <T: IMessage> clientFromHeaders(msg: Message<T>): UUID? {
+        val id = msg.headers().get(headerClientID) ?: return null
+        return UUID.fromString(id)
     }
 
     private fun <T: IMessage> sendToClient(address: String, msg: T, clientID: UUID) {
