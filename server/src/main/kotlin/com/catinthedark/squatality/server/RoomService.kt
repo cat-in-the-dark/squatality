@@ -106,7 +106,6 @@ class RoomService(
             val pos = Const.Balance.randomSpawn()
             val typeName = Const.Balance.randomBonus()
             bonuses += BonusModel(UUID.randomUUID(), pos.x, pos.y, typeName)
-            println("Bonuses: $bonuses")
         }
     }
 
@@ -139,74 +138,84 @@ class RoomService(
 
     private fun processPlayers() {
         players.forEach { p1 ->
-            if (!p1.value.model.state.equals(State.KILLED)) {
-                players.filter { p2 ->
-                    !p1.key.equals(p2.key)
-                        && p1.value.intersect(p2.value)
-                        && !p2.value.model.state.equals(State.KILLED)
-                }.forEach { p2 ->
-                    p1.value.moveVector.add(p1.value.pos.sub(p2.value.pos).setLength(Const.Balance.playerRadius - p1.value.pos.dst(p2.value.pos) / 2))
-                }
-
-                val wallShiftVector = Vector2()
-                    .add(intersect.leftWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
-                        intersect.topWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
-                    .sub(intersect.rightWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
-                        intersect.bottomWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
-
-                p1.value.moveVector.add(wallShiftVector)
-
-                val intersectedBricks = bricks.filter { brick ->
-                    (Vector2(p1.value.model.x, p1.value.model.y).dst(Vector2(brick.model.x, brick.model.y))
-                        < Const.Balance.playerRadius + Const.Balance.brickRadius)
-                }
-
-                if (intersectedBricks.isNotEmpty()) {
-                    val killerBricks = intersectedBricks.filter { brick ->
-                        brick.model.hurting
-                    }
-                    if (killerBricks.isNotEmpty()) {
-                        if (p1.value.model.bonuses.isNotEmpty()) {
-                            p1.value.model.bonuses.clear()
-                            killerBricks.forEach { brick ->
-                                brick.model.angle += 180.0f
-                            }
-                        } else {
-                            p1.value.model.state = State.KILLED
-                            p1.value.model.deaths += 1
-                            players.values.forEach { player ->
-                                // TODO: sounds have to reach clients
-                                val sound = SoundMessage(
-                                    when (Random().nextInt(10)) {
-                                        1 -> SoundName.ChponkSuka
-                                        2 -> SoundName.Tooth
-                                        else -> SoundName.HeadShot
-                                    })
-                            }
-                            killerBricks.forEach { brick ->
-                                val throwerID = brick.throwerID
-                                if (throwerID != null) {
-                                    val player = players[throwerID]
-                                    if (player != null) {
-                                        player.model.frags += 1
-                                    }
-                                }
-                            }
-                            executor.deffer(2, TimeUnit.SECONDS, {
-                                p1.value.model.state = State.IDLE
-                            })
-                        }
-                    } else if (!p1.value.model.hasBrick) {
-                        p1.value.model.hasBrick = true
-                        bricks -= intersectedBricks.first()
-                    }
-                }
+            if (p1.value.model.state != State.KILLED) {
+                processPlayersIntersect(p1)
+                processWallsIntersect(p1)
+                processBricksIntersect(p1)
             }
 
             players.forEach { p ->
                 p.value.model.x += p.value.moveVector.x
                 p.value.model.y += p.value.moveVector.y
                 p.value.moveVector.setZero()
+            }
+        }
+    }
+
+    private fun processPlayersIntersect(p1: Map.Entry<UUID, Player>) {
+        players.filter { p2 ->
+            p1.key != p2.key
+                && p1.value.intersect(p2.value)
+                && p2.value.model.state != State.KILLED
+        }.forEach { p2 ->
+            p1.value.moveVector.add(p1.value.pos.sub(p2.value.pos).setLength(Const.Balance.playerRadius - p1.value.pos.dst(p2.value.pos) / 2))
+        }
+    }
+
+    private fun processWallsIntersect(p1: Map.Entry<UUID, Player>) {
+        val wallShiftVector = Vector2()
+            .add(intersect.leftWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
+                intersect.topWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
+            .sub(intersect.rightWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
+                intersect.bottomWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
+
+        p1.value.moveVector.add(wallShiftVector)
+    }
+
+    private fun processBricksIntersect(p1: Map.Entry<UUID, Player>) {
+        val intersectedBricks = bricks.filter { brick ->
+            (Vector2(p1.value.model.x, p1.value.model.y).dst(Vector2(brick.model.x, brick.model.y))
+                < Const.Balance.playerRadius + Const.Balance.brickRadius)
+        }
+
+        if (intersectedBricks.isNotEmpty()) {
+            val killerBricks = intersectedBricks.filter { brick ->
+                brick.model.hurting
+            }
+            if (killerBricks.isNotEmpty()) {
+                if (p1.value.model.bonuses.isNotEmpty()) {
+                    p1.value.model.bonuses.clear()
+                    killerBricks.forEach { brick ->
+                        brick.model.angle += 180.0f
+                    }
+                } else {
+                    p1.value.model.state = State.KILLED
+                    p1.value.model.deaths += 1
+                    players.values.forEach { player ->
+                        // TODO: sounds have to reach clients
+                        val sound = SoundMessage(
+                            when (Random().nextInt(10)) {
+                                1 -> SoundName.ChponkSuka
+                                2 -> SoundName.Tooth
+                                else -> SoundName.HeadShot
+                            })
+                    }
+                    killerBricks.forEach { brick ->
+                        val throwerID = brick.throwerID
+                        if (throwerID != null) {
+                            val player = players[throwerID]
+                            if (player != null) {
+                                player.model.frags += 1
+                            }
+                        }
+                    }
+                    executor.deffer(2, TimeUnit.SECONDS, {
+                        p1.value.model.state = State.IDLE
+                    })
+                }
+            } else if (!p1.value.model.hasBrick) {
+                p1.value.model.hasBrick = true
+                bricks -= intersectedBricks.first()
             }
         }
     }
@@ -265,10 +274,13 @@ class RoomService(
 
     data class Player(
         val model: PlayerModel,
-        val moveVector: Vector2 = Vector2(),
-        val pos: Vector2 = Vector2(model.x, model.y)
+        val moveVector: Vector2 = Vector2()
     ) {
-        fun intersect(player: Player): Boolean =
-            pos.dst(player.pos) < (Const.Balance.playerRadius * 2)
+        val pos: Vector2
+            get() = Vector2(model.x, model.y)
+
+        fun intersect(player: Player): Boolean {
+            return pos.dst(player.pos) < (Const.Balance.playerRadius * 2)
+        }
     }
 }
