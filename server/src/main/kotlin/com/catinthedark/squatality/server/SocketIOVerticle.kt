@@ -47,14 +47,16 @@ class SocketIOVerticle : AbstractVerticle() {
     private val connectHandler = ConnectListener { client ->
         clientsInRoom[client.sessionId] = findOrCreateRoom()
         push(client, ServerHelloMessage(client.sessionId))
+        logger.info("Connected client ${client.sessionId}")
     }
 
     private val disconnectHandler = DisconnectListener { client ->
         val roomID = clientsInRoom[client.sessionId]
         if (roomID != null) {
-            clientsInRoom.remove(roomID)
+            clientsInRoom.remove(client.sessionId)
             vertx.eventBus().send(Addressing.onDisconnect(roomID), client.sessionId.toString())
         }
+        logger.info("Disconnected client ${client.sessionId}")
     }
 
     private val messageHandler = DataListener<String> { client, data, ackRequest ->
@@ -74,7 +76,7 @@ class SocketIOVerticle : AbstractVerticle() {
                 })
             }
         } catch (e: Exception) {
-            logger.error("Can't handle message: ${e.message}", e)
+            logger.error("Can't handle message $data: ${e.message}", e)
         }
     }
 
