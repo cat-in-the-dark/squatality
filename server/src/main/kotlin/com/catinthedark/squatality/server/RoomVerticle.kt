@@ -1,9 +1,9 @@
 package com.catinthedark.squatality.server
 
-import com.catinthedark.Const
 import com.catinthedark.lib.IExecutor
 import com.catinthedark.lib.IMessage
-import com.catinthedark.models.*
+import com.catinthedark.squatality.Const
+import com.catinthedark.squatality.models.*
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.eventbus.DeliveryOptions
 import io.vertx.core.eventbus.Message

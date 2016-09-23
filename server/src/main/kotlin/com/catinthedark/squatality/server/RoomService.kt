@@ -1,9 +1,9 @@
 package com.catinthedark.squatality.server
 
-import com.catinthedark.Const
 import com.catinthedark.lib.IExecutor
 import com.catinthedark.math.Vector2
-import com.catinthedark.models.*
+import com.catinthedark.squatality.Const
+import com.catinthedark.squatality.models.*
 import com.catinthedark.squatality.server.math.IntersectService
 import io.vertx.core.logging.LoggerFactory
 import java.util.*

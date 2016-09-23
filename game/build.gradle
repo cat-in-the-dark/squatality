@@ -1,4 +1,4 @@
-group 'com.catinthedark.squtality'
+group 'com.catinthedark.squatality'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'idea'

@@ -1,7 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IMessage
-import com.catinthedark.models.*
+import com.catinthedark.squatality.models.*
 import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer

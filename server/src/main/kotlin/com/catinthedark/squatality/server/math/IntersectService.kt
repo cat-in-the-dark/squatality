@@ -1,6 +1,6 @@
 package com.catinthedark.squatality.server.math
 
-import com.catinthedark.Const
+import com.catinthedark.squatality.Const
 
 class IntersectService {
     fun topWallPenetration(y: Float, radius: Float): Float {

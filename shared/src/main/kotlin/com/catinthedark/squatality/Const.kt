@@ -1,4 +1,4 @@
-package com.catinthedark
+package com.catinthedark.squatality
 
 import com.catinthedark.math.Vector2
 import java.util.*

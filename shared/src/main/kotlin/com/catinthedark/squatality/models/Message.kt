@@ -1,4 +1,4 @@
-package com.catinthedark.models
+package com.catinthedark.squatality.models
 
 import com.catinthedark.lib.IMessage
 import java.util.*

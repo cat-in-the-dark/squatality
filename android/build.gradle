@@ -1,4 +1,4 @@
-group 'com.catinthedark.squtality'
+group 'com.catinthedark.squatality'
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
