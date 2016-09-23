@@ -8,12 +8,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 object Assets {
     fun load(): AssetManager {
         return AssetManager().apply {
-            load("textures/logo.png", Texture::class.java)
-            load("font/tahoma-10.fnt", BitmapFont::class.java)
-            val sounds = listOf("bgm", "chponk_suka", "head_shot", "ricochet", "run", "siklo", "stadium", "throw", "zuby_po_vsey_ulitse")
-            sounds.forEach {
-                load("sound/$it.mp3", Music::class.java)
-            }
+            val textures = listOf("brick.png", "gop_black.png", "gop_red.png", "logo.png", "fans.png", "gop_blue.png", "gopofon.png", "menu.png", "field.png", "gop_green.png", "kepa.png", "title.png")
+            val sounds = listOf("bgm.mp3", "chponk_suka.mp3", "head_shot.mp3", "ricochet.mp3", "run.mp3", "siklo.mp3", "stadium.mp3", "throw.mp3", "zuby_po_vsey_ulitse.mp3")
+
+            load("fonts/tahoma-10.fnt", BitmapFont::class.java)
+            textures.forEach { load("textures/$it", Texture::class.java) }
+            sounds.forEach { load("sounds/$it", Music::class.java) }
         }
     }
 }

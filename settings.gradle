@@ -1,3 +1,3 @@
 rootProject.name = 'squatality'
 
-include 'server', 'core', 'android', 'game', 'lib'
+include 'server', 'shared', 'android', 'game'

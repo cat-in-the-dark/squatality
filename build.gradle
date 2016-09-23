@@ -6,7 +6,7 @@ subprojects {
         jcenter()
     }
     buildscript {
-        ext.kotlin_version = '1.0.3'
+        ext.kotlin_version = '1.0.4'
         dependencies {
             classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         }
@@ -20,5 +20,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '3.1'
 }

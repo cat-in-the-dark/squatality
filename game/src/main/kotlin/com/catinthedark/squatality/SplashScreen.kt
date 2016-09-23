@@ -14,7 +14,7 @@ class SplashScreen: YieldUnit<Unit, AssetManager> {
         if (am.update()) {
             return am
         }
-        println("Loading assets...")
+        println("Loading assets...${am.progress}")
         return null
     }
 
