@@ -2,6 +2,7 @@ package com.catinthedark.squatality
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.catinthedark.lib.RouteMachine
 
@@ -11,7 +12,7 @@ class SquatalityGame : Game() {
 
     override fun create() {
         batch = SpriteBatch()
-        val splash = SplashScreen()
+        val splash = SplashScreen(batch)
         val game = GameScreen()
 
         rm.addRoute(splash, { game })
@@ -19,8 +20,9 @@ class SquatalityGame : Game() {
     }
 
     override fun render() {
-        super.render()
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         rm.run(Gdx.graphics.deltaTime)
+        super.render()
     }
 
     override fun dispose() {
