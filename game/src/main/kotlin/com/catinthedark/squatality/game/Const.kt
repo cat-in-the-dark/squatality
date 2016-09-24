@@ -6,4 +6,8 @@ object Const {
         val HEIGHT = 720
         val ZOOM = 1f
     }
+
+    object UI {
+        val animationSpeed = 0.2f
+    }
 }

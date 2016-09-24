@@ -22,7 +22,7 @@ class SquatalityGame : Game() {
 
         val splash = SplashScreen(batch)
         val title = TitleScreen(batch)
-        val game = GameScreen()
+        val game = GameScreen(batch)
 
         rm.addRoute(splash, { title })
         rm.addRoute(title, { game })
