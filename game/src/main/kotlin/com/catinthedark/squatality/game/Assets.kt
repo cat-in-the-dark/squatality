@@ -19,5 +19,6 @@ object Assets {
 
     object Names {
         val LOGO = "textures/logo.png"
+        val TITLE = "textures/title.png"
     }
 }

@@ -21,16 +21,19 @@ class SquatalityGame : Game() {
             OrthographicCamera())
 
         val splash = SplashScreen(batch)
+        val title = TitleScreen(batch)
         val game = GameScreen()
 
-        rm.addRoute(splash, { game })
-        rm.start(splash, viewport)
+        rm.addRoute(splash, { title })
+        rm.addRoute(title, { game })
+        rm.start(splash, Unit)
     }
 
     override fun render() {
         Gdx.gl.glClearColor(255f,255f,255f,0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         viewport.apply(true)
+        batch.projectionMatrix = viewport.camera.combined
         rm.run(Gdx.graphics.deltaTime)
         super.render()
     }

@@ -9,7 +9,10 @@ class MainActivity : AndroidApplication() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val cfg = AndroidApplicationConfiguration()
+        val cfg = AndroidApplicationConfiguration().apply {
+            useImmersiveMode = true
+            hideStatusBar = true
+        }
         initialize(SquatalityGame(), cfg)
     }
 }
