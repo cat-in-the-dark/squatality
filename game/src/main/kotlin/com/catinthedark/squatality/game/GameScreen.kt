@@ -1,4 +1,4 @@
-package com.catinthedark.squatality
+package com.catinthedark.squatality.game
 
 import com.badlogic.gdx.assets.AssetManager
 import com.catinthedark.lib.YieldUnit

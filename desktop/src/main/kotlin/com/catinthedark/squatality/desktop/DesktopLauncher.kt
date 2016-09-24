@@ -2,7 +2,7 @@ package com.catinthedark.squatality.desktop
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.catinthedark.squatality.SquatalityGame
+import com.catinthedark.squatality.game.SquatalityGame
 
 object DesktopLauncher {
     @JvmStatic
