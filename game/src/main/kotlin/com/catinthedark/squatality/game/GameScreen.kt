@@ -2,6 +2,7 @@ package com.catinthedark.squatality.game
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.PooledEngine
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -39,6 +40,8 @@ class GameScreen(
         engine.addEntity(createField())
         engine.addEntity(createKnob(15f, 15f))
         engine.addEntity(createKnob(1015f, 15f))
+
+        Gdx.input.inputProcessor = stage
     }
 
     override fun run(delta: Float): Any? {
