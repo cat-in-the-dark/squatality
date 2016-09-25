@@ -24,7 +24,7 @@ class SquatalityGame : Game() {
 
         val splash = SplashScreen(batch)
         val title = TitleScreen(batch)
-        val game = GameScreen(batch)
+        val game = GameScreen(batch, viewport)
 
         rm.addRoute(splash, { title })
         rm.addRoute(title, { game })
