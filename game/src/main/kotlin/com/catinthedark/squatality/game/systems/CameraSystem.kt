@@ -11,7 +11,7 @@ class CameraSystem(
     Family.all(CameraComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val cam = Mappers.camera.get(entity)
-        val target = Mappers.texture.get(entity)
+        val cam = Mappers.camera[entity]
+        val target = Mappers.texture[entity]
     }
 }

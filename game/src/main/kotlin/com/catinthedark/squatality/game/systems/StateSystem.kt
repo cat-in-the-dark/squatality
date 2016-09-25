@@ -10,7 +10,7 @@ class StateSystem: IteratingSystem(
     Family.all(StateComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val state = Mappers.state.get(entity)
+        val state = Mappers.state[entity]
         if (state.state == "RUNNING") {
             state.time += deltaTime * 2
         } else {

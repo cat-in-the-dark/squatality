@@ -2,6 +2,7 @@ package com.catinthedark.squatality.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.FPSLogger
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -9,9 +10,10 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.catinthedark.lib.RouteMachine
 
 class SquatalityGame : Game() {
-    lateinit var batch: SpriteBatch
-    val rm = RouteMachine()
-    lateinit var viewport: ExtendViewport
+    private lateinit var batch: SpriteBatch
+    private val rm = RouteMachine()
+    private lateinit var viewport: ExtendViewport
+    private val fps = FPSLogger()
 
     override fun create() {
         batch = SpriteBatch()
@@ -35,6 +37,7 @@ class SquatalityGame : Game() {
         viewport.apply(true)
         batch.projectionMatrix = viewport.camera.combined
         rm.run(Gdx.graphics.deltaTime)
+        fps.log()
         super.render()
     }
 

@@ -40,7 +40,7 @@ class GameScreen(
     }
 
     override fun onExit() {
-
+        engine.removeAllEntities()
     }
 
     fun createHelp(): Entity {
