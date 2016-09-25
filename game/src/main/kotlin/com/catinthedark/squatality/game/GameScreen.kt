@@ -30,16 +30,17 @@ class GameScreen(
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
         engine.addSystem(MoveSystem())
-        engine.addSystem(RandomControlSystem())
-        engine.addSystem(KnobControlSystem(stage))
+        //engine.addSystem(RandomControlSystem())
+        engine.addSystem(KnobMovementSystem(stage))
 
-        engine.addEntity(createPlayer(0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE))))
+        val mainPlayerComponent = createPlayer(0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
+        engine.addEntity(mainPlayerComponent)
         engine.addEntity(createPlayer(200f, 200f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED))))
         engine.addEntity(createPlayer(400f, 200f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLACK))))
         engine.addEntity(createPlayer(600f, 600f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED))))
         engine.addEntity(createField())
-        engine.addEntity(createKnob(15f, 15f))
-        engine.addEntity(createKnob(1015f, 15f))
+        engine.addEntity(createMovementKnob(15f, 15f, mainPlayerComponent.getComponent(MoveComponent::class.java)))
+        //engine.addEntity(createAimKnob(1015f, 15f))
 
         Gdx.input.inputProcessor = stage
     }
@@ -82,6 +83,8 @@ class GameScreen(
 
             trc.pos.x = x
             trc.pos.y = y
+            mc.acceleration.x = 200f
+            mc.acceleration.y = 200f
 
             add(ac)
             add(tc)
@@ -102,7 +105,7 @@ class GameScreen(
         }
     }
 
-    fun createKnob(x: Float, y : Float): Entity {
+    fun createMovementKnob(x: Float, y : Float, mc: MoveComponent): Entity {
         return engine.createEntity().apply {
             val kc = engine.createComponent(KnobComponent::class.java)
             kc.touchPad = Touchpad(10f,
@@ -116,6 +119,7 @@ class GameScreen(
             stage.addActor(kc.touchPad)
 
             add(kc)
+            add(mc)
         }
     }
 }

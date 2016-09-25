@@ -16,5 +16,6 @@ class MoveSystem: IteratingSystem(
 
         tc.pos.x += deltaTime * mc.velocity.x
         tc.pos.y += deltaTime * mc.velocity.y
+        tc.angle = mc.velocity.angle() - 90
     }
 }

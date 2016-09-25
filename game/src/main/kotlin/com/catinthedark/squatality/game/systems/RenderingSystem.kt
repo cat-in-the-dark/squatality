@@ -24,8 +24,16 @@ class RenderingSystem(
         batch.managed { b ->
             val tex = Mappers.texture[entity]
             val t = Mappers.transform[entity]
-            if (tex != null && t != null && tex.region != null) {
-                b.draw(tex.region, t.pos.x, t.pos.y)
+            val region = tex?.region
+            if (region != null && t != null) {
+                b.draw(
+                    region,
+                    t.pos.x, t.pos.y,
+                    region.regionWidth.toFloat() / 2, region.regionHeight.toFloat() / 2,
+                    region.regionWidth.toFloat(), region.regionHeight.toFloat(),
+                    1f, 1f,
+                    t.angle
+                )
             }
         }
         stage.draw()
