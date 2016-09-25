@@ -20,6 +20,7 @@ object Assets {
     }
 
     object Names {
+        val FONT = "fonts/tahoma-10.fnt"
         val LOGO = "textures/logo.png"
         val TITLE = "textures/title.png"
         val TUTORIAL = "textures/menu.png"

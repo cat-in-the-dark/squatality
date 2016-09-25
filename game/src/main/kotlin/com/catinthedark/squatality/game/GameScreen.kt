@@ -7,13 +7,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.catinthedark.lib.YieldUnit
-import com.catinthedark.squatality.game.components.AnimationComponent
-import com.catinthedark.squatality.game.components.StateComponent
-import com.catinthedark.squatality.game.components.TextureComponent
-import com.catinthedark.squatality.game.components.TransformComponent
-import com.catinthedark.squatality.game.systems.AnimationSystem
-import com.catinthedark.squatality.game.systems.RenderingSystem
-import com.catinthedark.squatality.game.systems.StateSystem
+import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.systems.*
 
 class GameScreen(
     private val batch: SpriteBatch
@@ -27,6 +22,8 @@ class GameScreen(
         engine.addSystem(RenderingSystem(batch))
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
+        engine.addSystem(MoveSystem())
+        engine.addSystem(RandomControlSystem())
 
         engine.addEntity(createPlayer(0f,0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE))))
         engine.addEntity(createPlayer(200f,200f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED))))
@@ -59,6 +56,7 @@ class GameScreen(
             val tc = engine.createComponent(TextureComponent::class.java)
             val sc = engine.createComponent(StateComponent::class.java)
             val trc = engine.createComponent(TransformComponent::class.java)
+            val mc = engine.createComponent(MoveComponent::class.java)
 
             ac.animations["IDLE"] = skin.idle
             ac.animations["RUNNING"] = skin.running
@@ -75,6 +73,7 @@ class GameScreen(
             add(tc)
             add(sc)
             add(trc)
+            add(mc)
         })
     }
 }
