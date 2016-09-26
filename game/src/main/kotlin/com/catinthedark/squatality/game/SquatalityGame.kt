@@ -11,20 +11,28 @@ import com.catinthedark.lib.RouteMachine
 
 class SquatalityGame : Game() {
     private lateinit var batch: SpriteBatch
+    private lateinit var hudBatch: SpriteBatch
     private val rm = RouteMachine()
     private lateinit var viewport: ExtendViewport
+    private lateinit var hudViewport: ExtendViewport
     private val fps = FPSLogger()
 
     override fun create() {
         batch = SpriteBatch()
+        hudBatch = SpriteBatch()
         viewport = ExtendViewport(
             Const.Screen.WIDTH / Const.Screen.ZOOM,
             Const.Screen.HEIGHT / Const.Screen.ZOOM,
             OrthographicCamera())
 
-        val splash = SplashScreen(batch)
-        val title = TitleScreen(batch)
-        val game = GameScreen(batch, viewport)
+        hudViewport = ExtendViewport(
+            Const.Screen.WIDTH / Const.Screen.ZOOM,
+            Const.Screen.HEIGHT / Const.Screen.ZOOM,
+            OrthographicCamera())
+
+        val splash = SplashScreen(hudBatch)
+        val title = TitleScreen(hudBatch)
+        val game = GameScreen(batch, hudBatch, viewport, hudViewport)
 
         rm.addRoute(splash, { title })
         rm.addRoute(title, { game })
@@ -32,10 +40,12 @@ class SquatalityGame : Game() {
     }
 
     override fun render() {
-        Gdx.gl.glClearColor(255f,255f,255f,0f)
+        Gdx.gl.glClearColor(0f,0f,0f,0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-        viewport.apply(true)
+        hudViewport.apply(true)
+        viewport.apply()
         batch.projectionMatrix = viewport.camera.combined
+        hudBatch.projectionMatrix = hudViewport.camera.combined
         rm.run(Gdx.graphics.deltaTime)
         fps.log()
         super.render()

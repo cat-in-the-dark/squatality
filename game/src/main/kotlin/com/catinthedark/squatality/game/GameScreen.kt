@@ -17,11 +17,13 @@ import com.catinthedark.squatality.game.systems.*
 
 class GameScreen(
     private val batch: SpriteBatch,
-    private val viewport: ExtendViewport
+    private val hudBatch: SpriteBatch,
+    private val viewport: ExtendViewport,
+    private val hudViewport: ExtendViewport
 ) : YieldUnit<AssetManager, Any> {
     private val engine = PooledEngine()
     private lateinit var am: AssetManager
-    private val stage = Stage(viewport, batch)
+    private val stage = Stage(hudViewport, hudBatch)
 
     override fun onActivate(data: AssetManager) {
         println("GameScreen started")
@@ -32,6 +34,7 @@ class GameScreen(
         engine.addSystem(MoveSystem())
         //engine.addSystem(RandomControlSystem())
         engine.addSystem(KnobMovementSystem(stage))
+        engine.addSystem(CameraSystem(viewport.camera))
 
         val mainPlayerComponent = createPlayer(0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
         engine.addEntity(mainPlayerComponent)
@@ -41,6 +44,7 @@ class GameScreen(
         engine.addEntity(createField())
         engine.addEntity(createMovementKnob(15f, 15f, mainPlayerComponent.getComponent(MoveComponent::class.java)))
         //engine.addEntity(createAimKnob(1015f, 15f))
+        engine.addEntity(createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
 
         Gdx.input.inputProcessor = stage
     }
@@ -83,8 +87,8 @@ class GameScreen(
 
             trc.pos.x = x
             trc.pos.y = y
-            mc.acceleration.x = 200f
-            mc.acceleration.y = 200f
+            mc.acceleration.x = 250f
+            mc.acceleration.y = 250f
 
             add(ac)
             add(tc)
@@ -120,6 +124,13 @@ class GameScreen(
 
             add(kc)
             add(mc)
+        }
+    }
+
+    fun createCamera(target: TransformComponent): Entity {
+        return engine.createEntity().apply {
+            add(engine.createComponent(CameraComponent::class.java))
+            add(target)
         }
     }
 }
