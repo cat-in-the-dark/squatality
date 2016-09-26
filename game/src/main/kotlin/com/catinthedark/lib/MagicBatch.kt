@@ -1,8 +1,8 @@
 package com.catinthedark.lib
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.Batch
 
-fun SpriteBatch.managed(block: (batch: SpriteBatch) -> Unit) {
+fun Batch.managed(block: (batch: Batch) -> Unit) {
     begin()
     block(this)
     end()

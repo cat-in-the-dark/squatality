@@ -12,8 +12,8 @@ import com.catinthedark.squatality.game.components.TransformComponent
 import java.util.*
 
 class RenderingSystem(
-    private val batch: SpriteBatch,
-    private val stage: Stage
+    private val stage: Stage,
+    private val hudStage: Stage
 ) : SortedIteratingSystem(
     Family.all(TextureComponent::class.java, TransformComponent::class.java).get(),
     Comparator<Entity> { a, b ->
@@ -21,7 +21,7 @@ class RenderingSystem(
     }
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        batch.managed { b ->
+        stage.batch.managed { b ->
             val tex = Mappers.texture[entity]
             val t = Mappers.transform[entity]
             val region = tex?.region
@@ -37,6 +37,7 @@ class RenderingSystem(
             }
         }
         stage.draw()
+        hudStage.draw()
     }
 
 }

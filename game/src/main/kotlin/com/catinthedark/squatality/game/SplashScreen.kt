@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
 
 class SplashScreen(
-    private val batch: SpriteBatch
+    private val stage: Stage
 ): YieldUnit<Unit, AssetManager> {
     lateinit var am: AssetManager
 
@@ -23,10 +24,11 @@ class SplashScreen(
             Gdx.app.log("SplashScreen", "Loading assets...${am.progress}")
         }
         if (am.isLoaded(Assets.Names.LOGO, Texture::class.java)) {
-            batch.managed {
+            stage.batch.managed {
                 it.draw(am.get(Assets.Names.LOGO, Texture::class.java), 0f, 0f)
             }
         }
+        stage.draw()
 
         return null
     }

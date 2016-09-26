@@ -10,31 +10,28 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.systems.*
 
 class GameScreen(
-    private val batch: SpriteBatch,
-    private val hudBatch: SpriteBatch,
-    private val viewport: ExtendViewport,
-    private val hudViewport: ExtendViewport
+    private val stage: Stage,
+    private val hudStage: Stage
 ) : YieldUnit<AssetManager, Any> {
     private val engine = PooledEngine()
     private lateinit var am: AssetManager
-    private val stage = Stage(hudViewport, hudBatch)
 
     override fun onActivate(data: AssetManager) {
         println("GameScreen started")
         am = data
-        engine.addSystem(RenderingSystem(batch, stage))
+        engine.addSystem(RenderingSystem(stage, hudStage))
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
         engine.addSystem(MoveSystem())
         //engine.addSystem(RandomControlSystem())
-        engine.addSystem(KnobMovementSystem(stage))
-        engine.addSystem(CameraSystem(viewport.camera))
+        engine.addSystem(KnobMovementSystem())
+        engine.addSystem(CameraSystem(stage.camera))
 
         val mainPlayerComponent = createPlayer(0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
         engine.addEntity(mainPlayerComponent)
@@ -46,7 +43,7 @@ class GameScreen(
         //engine.addEntity(createAimKnob(1015f, 15f))
         engine.addEntity(createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
 
-        Gdx.input.inputProcessor = stage
+        Gdx.input.inputProcessor = hudStage
     }
 
     override fun run(delta: Float): Any? {
@@ -109,7 +106,7 @@ class GameScreen(
         }
     }
 
-    fun createMovementKnob(x: Float, y : Float, mc: MoveComponent): Entity {
+    fun createMovementKnob(x: Float, y: Float, mc: MoveComponent): Entity {
         return engine.createEntity().apply {
             val kc = engine.createComponent(KnobComponent::class.java)
             kc.touchPad = Touchpad(10f,
@@ -120,7 +117,7 @@ class GameScreen(
             ).apply {
                 setBounds(x, y, 250f, 250f)
             }
-            stage.addActor(kc.touchPad)
+            hudStage.addActor(kc.touchPad)
 
             add(kc)
             add(mc)

@@ -3,11 +3,12 @@ package com.catinthedark.squatality.game
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
 
 class TitleScreen(
-    private val batch: SpriteBatch
+    private val stage: Stage
 ): YieldUnit<AssetManager, AssetManager> {
     private lateinit var am: AssetManager
 
@@ -19,9 +20,10 @@ class TitleScreen(
     }
 
     override fun run(delta: Float): AssetManager? {
-        batch.managed {
+        stage.batch.managed {
             it.draw(am.get(Assets.Names.TITLE, Texture::class.java), 0f, 0f)
         }
+        stage.draw()
         time += delta
         if (time > 0.5) return am
         return null
