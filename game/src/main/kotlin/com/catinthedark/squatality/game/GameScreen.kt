@@ -126,7 +126,10 @@ class GameScreen(
 
     fun createCamera(target: TransformComponent): Entity {
         return engine.createEntity().apply {
-            add(engine.createComponent(CameraComponent::class.java))
+            val cam = engine.createComponent(CameraComponent::class.java)
+            cam.rightUpperCorner.x = 1551f
+            cam.rightUpperCorner.y = 1122f
+            add(cam)
             add(target)
         }
     }
