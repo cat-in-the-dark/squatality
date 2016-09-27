@@ -7,7 +7,7 @@ import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 
-class MoveSystem: IteratingSystem(
+class LocalMovementSystem : IteratingSystem(
     Family.all(MoveComponent::class.java, TransformComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
@@ -16,6 +16,8 @@ class MoveSystem: IteratingSystem(
 
         tc.pos.x += deltaTime * mc.velocity.x
         tc.pos.y += deltaTime * mc.velocity.y
-        tc.angle = mc.velocity.angle() - 90
+        if (mc.velocity.x != 0f || mc.velocity.y != 0f) {
+            tc.angle = mc.velocity.angle() - 90
+        }
     }
 }

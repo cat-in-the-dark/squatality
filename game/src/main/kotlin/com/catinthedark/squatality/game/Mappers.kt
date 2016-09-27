@@ -11,4 +11,5 @@ object Mappers {
     val state = ComponentMapper.getFor(StateComponent::class.java)!!
     val movement = ComponentMapper.getFor(MoveComponent::class.java)!!
     val knob = ComponentMapper.getFor(KnobComponent::class.java)!!
+    val aim = ComponentMapper.getFor(AimComponent::class.java)!!
 }

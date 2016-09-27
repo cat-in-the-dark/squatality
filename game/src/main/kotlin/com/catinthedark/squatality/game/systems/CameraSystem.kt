@@ -16,7 +16,6 @@ class CameraSystem(
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val targetC = Mappers.transform[entity]
         val camC = Mappers.camera[entity]
-        println("${cam.viewportWidth}: ${targetC.pos.x}")
 
         if (targetC.pos.x - camC.leftBottomCorner.x > cam.viewportWidth / 2) {
             if (camC.rightUpperCorner.x - targetC.pos.x > cam.viewportWidth / 2) {

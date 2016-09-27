@@ -28,9 +28,10 @@ class GameScreen(
         engine.addSystem(RenderingSystem(stage, hudStage))
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
-        engine.addSystem(MoveSystem())
+        engine.addSystem(LocalMovementSystem())
         //engine.addSystem(RandomControlSystem())
         engine.addSystem(KnobMovementSystem())
+        engine.addSystem(KnobAimSystem())
         engine.addSystem(CameraSystem(stage.camera))
 
         val mainPlayerComponent = createPlayer(0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
@@ -40,7 +41,7 @@ class GameScreen(
         engine.addEntity(createPlayer(600f, 600f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED))))
         engine.addEntity(createField())
         engine.addEntity(createMovementKnob(15f, 15f, mainPlayerComponent.getComponent(MoveComponent::class.java)))
-        //engine.addEntity(createAimKnob(1015f, 15f))
+        engine.addEntity(createAimKnob(1015f, 15f, mainPlayerComponent.getComponent(AimComponent::class.java)))
         engine.addEntity(createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
 
         Gdx.input.inputProcessor = hudStage
@@ -73,6 +74,7 @@ class GameScreen(
             val sc = engine.createComponent(StateComponent::class.java)
             val trc = engine.createComponent(TransformComponent::class.java)
             val mc = engine.createComponent(MoveComponent::class.java)
+            val aimC = engine.createComponent(AimComponent::class.java)
 
             ac.animations["IDLE"] = skin.idle
             ac.animations["RUNNING"] = skin.running
@@ -92,6 +94,7 @@ class GameScreen(
             add(sc)
             add(trc)
             add(mc)
+            add(aimC)
         })
     }
 
@@ -121,6 +124,24 @@ class GameScreen(
 
             add(kc)
             add(mc)
+        }
+    }
+
+    fun createAimKnob(x: Float, y: Float, ac: AimComponent) : Entity {
+        return engine.createEntity().apply {
+            val kc = engine.createComponent(KnobComponent::class.java)
+            kc.touchPad = Touchpad(10f,
+                Touchpad.TouchpadStyle().apply {
+                    background = TextureRegionDrawable(TextureRegion(am.get(Assets.Names.KNOB_BACKGROUND, Texture::class.java)))
+                    knob = TextureRegionDrawable(TextureRegion(am.get(Assets.Names.KNOB, Texture::class.java)))
+                }
+            ).apply {
+                setBounds(x, y, 250f, 250f)
+            }
+            hudStage.addActor(kc.touchPad)
+
+            add(kc)
+            add(ac)
         }
     }
 
