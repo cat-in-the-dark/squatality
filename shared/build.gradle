@@ -9,6 +9,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.7.5'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
