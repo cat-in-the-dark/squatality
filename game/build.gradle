@@ -10,6 +10,7 @@ targetCompatibility = 1.8
 
 dependencies {
     compile project(':shared')
+    compile "io.socket:socket.io-client:0.7.0"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.ashley:ashley:1.7.3"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
