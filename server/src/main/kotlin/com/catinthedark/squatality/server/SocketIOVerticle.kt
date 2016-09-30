@@ -25,7 +25,7 @@ class SocketIOVerticle : AbstractVerticle() {
 
     init {
         config = Configuration()
-        config.port = 8080
+        config.port = Configs.port
         config.socketConfig.isReuseAddress = true
         config.isUseLinuxNativeEpoll
         server = SocketIOServer(config)

@@ -1,9 +1,9 @@
 package com.catinthedark.squatality.models
 
+import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.JsonConverter
 import com.catinthedark.lib.Parser
 import com.catinthedark.lib.Register
-import com.catinthedark.squatality.models.*
 
 object MessageConverter {
     private val converter = JsonConverter()
@@ -27,5 +27,9 @@ object MessageConverter {
             SoundMessage::class.java,
             ThrowBrickMessage::class.java
         ))
+    }
+
+    fun <T : IMessage> register(clazz: Class<T>) {
+        converter.add(clazz)
     }
 }
