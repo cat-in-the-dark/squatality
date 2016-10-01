@@ -10,7 +10,11 @@ targetCompatibility = 1.8
 
 dependencies {
     compile project(':shared')
-    compile "io.socket:socket.io-client:0.7.0"
+    compile "org.slf4j:slf4j-simple:1.7.7"
+    compile ('io.socket:socket.io-client:0.8.1') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.ashley:ashley:1.7.3"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

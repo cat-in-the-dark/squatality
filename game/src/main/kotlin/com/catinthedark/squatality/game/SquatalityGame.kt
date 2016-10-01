@@ -13,7 +13,6 @@ import com.catinthedark.lib.RouteMachine
 
 class SquatalityGame : Game() {
     private val rm = RouteMachine()
-    private val fps = FPSLogger()
 
     private lateinit var stage: Stage
     private lateinit var hudStage: Stage
@@ -46,7 +45,6 @@ class SquatalityGame : Game() {
         hudStage.act(Gdx.graphics.deltaTime)
         stage.act(Gdx.graphics.deltaTime)
         rm.run(Gdx.graphics.deltaTime)
-        fps.log()
         super.render()
     }
 

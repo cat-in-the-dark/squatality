@@ -1,5 +1,7 @@
 package com.catinthedark.squatality.game
 
+import java.net.URI
+
 object Const {
     object Screen {
         val WIDTH = 1280
@@ -9,5 +11,9 @@ object Const {
 
     object UI {
         val animationSpeed = 0.2f
+    }
+
+    object Network {
+        val server: URI = URI.create("https://squatality-test.herokuapp.com/")
     }
 }
