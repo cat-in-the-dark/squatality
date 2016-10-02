@@ -16,4 +16,5 @@ object Addressing {
 
     fun onGameState() = "socket.onGameState"
     fun onGameStarted() = "socket.onGameStarted"
+    fun onEnemyConnected() = "socket.onEnemyConnected"
 }

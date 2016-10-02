@@ -4,6 +4,7 @@ import com.catinthedark.lib.IMessage
 import java.util.*
 
 data class EnemyDisconnectedMessage(val clientId: UUID) : IMessage
+data class EnemyConnectedMessage(val clientId: UUID): IMessage
 data class GameStartedMessage(val clientId: UUID) : IMessage
 data class RoundEndsMessage(val gameStateModel: GameStateModel) : IMessage
 data class HelloMessage(val name: String) : IMessage

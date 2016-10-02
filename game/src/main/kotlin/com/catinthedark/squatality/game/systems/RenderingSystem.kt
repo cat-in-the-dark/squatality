@@ -3,7 +3,6 @@ package com.catinthedark.squatality.game.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.SortedIteratingSystem
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.managed
 import com.catinthedark.squatality.game.Mappers
@@ -26,9 +25,15 @@ class RenderingSystem(
             val t = Mappers.transform[entity]
             val region = tex?.region
             if (region != null && t != null) {
+                var x = t.pos.x
+                var y = t.pos.y
+                if (tex.centered) {
+                    x = t.pos.x - region.regionWidth.toFloat() / 2
+                    y = t.pos.y - region.regionHeight.toFloat() / 2
+                }
                 b.draw(
                     region,
-                    t.pos.x, t.pos.y,
+                    x, y,
                     region.regionWidth.toFloat() / 2, region.regionHeight.toFloat() / 2,
                     region.regionWidth.toFloat(), region.regionHeight.toFloat(),
                     1f, 1f,

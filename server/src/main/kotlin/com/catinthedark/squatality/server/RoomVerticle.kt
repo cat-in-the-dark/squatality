@@ -49,6 +49,9 @@ class RoomVerticle: AbstractVerticle() {
         val body = msg.body() ?: return
         val id = service.onNewClient(body, clientID) ?: return
         sendToClient(Addressing.onGameStarted(), GameStartedMessage(id), clientID)
+        service.playersExcept(id).forEach {
+            sendToClient(Addressing.onEnemyConnected(), EnemyConnectedMessage(id), it)
+        }
     }
 
     private fun throwBrickHandler(msg: Message<ThrowBrickMessage>) {

@@ -28,11 +28,9 @@ class RemoteMovementSystem(
             rtc.angle = mc.velocity.angle() - 90
         }
 
-        println("PROCESS")
         if (rtc.lastSync > Const.Network.syncDelay) {
             send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = sc.state ?: ""))
             rtc.reset()
-            println("SEND")
         }
     }
 }

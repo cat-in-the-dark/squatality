@@ -23,6 +23,10 @@ class RoomService(
     private var time: Long = 0
     private val intersect = IntersectService()
 
+    fun playersExcept(id: UUID): Set<UUID> {
+        return players.filterKeys { it != id }.keys
+    }
+
     fun onNewClient(msg: HelloMessage, clientID: UUID): UUID? {
         if (hasFreePlace()) {
             val pos = Const.Balance.randomSpawn()
@@ -68,7 +72,7 @@ class RoomService(
         }
     }
 
-    fun onDisconnect(clientID: UUID) {
+    fun onDisconnect(clientID: UUID): UUID? {
         logger.info("Disconnected $clientID")
         val playerToRemove = players[clientID]
         if (playerToRemove != null) {
@@ -84,8 +88,10 @@ class RoomService(
                     initialSpeed = 0f)
             }
             players.remove(clientID)
+            return clientID
         }
         logger.info("Room size: ${players.size}")
+        return null
     }
 
     fun onTick(delta: Long): List<Pair<UUID, GameStateModel>> {

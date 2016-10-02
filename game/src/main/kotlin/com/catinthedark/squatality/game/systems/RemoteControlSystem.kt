@@ -41,6 +41,6 @@ class RemoteControlSystem(
     }
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        // nothing ot do
+        // nothing to do
     }
 }

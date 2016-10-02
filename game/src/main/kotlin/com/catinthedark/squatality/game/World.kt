@@ -45,6 +45,7 @@ class World(
             ac.animations["IDLE_WITH_BRICK"] = skin.idleWithBrick
             sc.state = "IDLE"
 
+            tc.centered = true
             trc.pos.x = x
             trc.pos.y = y
             mc.acceleration.x = 250f
