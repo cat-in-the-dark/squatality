@@ -7,8 +7,8 @@ object Const {
     object UI {
         val horizontalBorderWidth = 80f
         val verticalBorderWidth = 40f
-        val fieldWidth = 1081f
-        val fieldHeight = 652f
+        val fieldWidth = 1280f
+        val fieldHeight = 720f
 
         val playerSkinNames = listOf(
             "gop_black",
