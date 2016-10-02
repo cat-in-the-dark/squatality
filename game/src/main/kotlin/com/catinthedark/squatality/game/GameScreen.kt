@@ -43,6 +43,11 @@ class GameScreen(
             engine.addEntity(world.createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
         }
 
+        nc.onEnemyConnected.subscribe {
+            val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
+            engine.addEntity(enemy)
+        }
+
         Gdx.input.inputProcessor = hudStage
         ncThread = Thread(nc)
         ncThread.start()

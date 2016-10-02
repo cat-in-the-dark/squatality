@@ -18,25 +18,27 @@ class RemoteControlSystem(
 ): IteratingSystem(
     Family.all(TransformComponent::class.java, StateComponent::class.java, RemoteIDComponent::class.java).get()
 ) {
-    val states = ConcurrentLinkedQueue<GameStateModel>()
+    val gameStates = ConcurrentLinkedQueue<GameStateModel>()
 
     override fun addedToEngine(engine: Engine?) {
         super.addedToEngine(engine)
         onGameState.subscribe { state ->
-            states.add(state)
+            gameStates.add(state)
         }
     }
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
-        val state = states.poll() ?: return
+        val gs = gameStates.poll() ?: return
         entities.forEach { entity ->
+            val sc = Mappers.state[entity] ?: return@forEach
             val rc = Mappers.remote.id[entity] ?: return@forEach
             val tc = Mappers.transform[entity] ?: return@forEach
-            val target = state.players.find { it.id == rc.id } ?: return@forEach
+            val target = gs.players.find { it.id == rc.id } ?: return@forEach
             tc.pos.x = target.x
             tc.pos.y = target.y
             tc.angle = target.angle
+            sc.state = target.state.name
         }
     }
 

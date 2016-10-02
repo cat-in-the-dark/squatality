@@ -10,6 +10,7 @@ import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.RemoteMoveComponent
 import com.catinthedark.squatality.game.components.StateComponent
 import com.catinthedark.squatality.models.MoveMessage
+import com.catinthedark.squatality.models.State
 
 class RemoteMovementSystem(
     private val send: (IMessage) -> Unit
@@ -29,7 +30,12 @@ class RemoteMovementSystem(
         }
 
         if (rtc.lastSync > Const.Network.syncDelay) {
-            send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = sc.state ?: ""))
+            val state = if (rtc.velocity.isZero) {
+                State.IDLE
+            } else {
+                State.RUNNING
+            }
+            send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
             rtc.reset()
         }
     }

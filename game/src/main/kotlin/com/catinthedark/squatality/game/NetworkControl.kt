@@ -18,6 +18,8 @@ class NetworkControl(serverAddress: URI): Runnable {
 
     val onGameState = Observable<GameStateModel>()
     val onGameStarted = Observable<GameStartedMessage>()
+    val onEnemyConnected = Observable<EnemyConnectedMessage>()
+    val onEnemyDisconnected = Observable<EnemyDisconnectedMessage>()
     val sender: (IMessage) -> Unit = {
         messageBus.send(it)
     }
@@ -47,6 +49,14 @@ class NetworkControl(serverAddress: URI): Runnable {
         })
         subscribe(GameStateMessage::class.java, {
             onGameState(it.gameStateModel)
+        })
+        subscribe(EnemyConnectedMessage::class.java, {
+            Gdx.app.log(TAG, "EnemyConnectedMessage $it")
+            onEnemyConnected(it)
+        })
+        subscribe(EnemyDisconnectedMessage::class.java, {
+            Gdx.app.log(TAG, "EnemyDisconnectedMessage $it")
+            onEnemyDisconnected(it)
         })
     }
 
