@@ -35,12 +35,16 @@ class GameScreen(
 
         engine.addEntity(world.createField())
 
-        nc.onGameStarted.subscribe {
-            val mainPlayerComponent = world.createPlayer(it.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.BLUE)))
+        nc.onGameStarted.subscribe { gsm ->
+            val mainPlayerComponent = world.createPlayer(gsm.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.BLUE)))
             engine.addEntity(mainPlayerComponent)
             engine.addEntity(world.createMovementKnob(15f, 15f, mainPlayerComponent.getComponent(MoveComponent::class.java), hudStage))
             engine.addEntity(world.createAimKnob(1015f, 15f, mainPlayerComponent.getComponent(AimComponent::class.java), hudStage))
             engine.addEntity(world.createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
+            gsm.enemies.forEach { enemyId ->
+                val enemy = world.createUnit(enemyId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
+                engine.addEntity(enemy)
+            }
         }
 
         nc.onEnemyConnected.subscribe {

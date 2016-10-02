@@ -48,7 +48,8 @@ class RoomVerticle: AbstractVerticle() {
         val clientID = clientFromHeaders(msg) ?: return
         val body = msg.body() ?: return
         val id = service.onNewClient(body, clientID) ?: return
-        sendToClient(Addressing.onGameStarted(), GameStartedMessage(id), clientID)
+        val enemies = service.playersExcept(id)
+        sendToClient(Addressing.onGameStarted(), GameStartedMessage(id, enemies), clientID)
         service.playersExcept(id).forEach {
             sendToClient(Addressing.onEnemyConnected(), EnemyConnectedMessage(id), it)
         }
