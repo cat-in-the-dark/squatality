@@ -47,6 +47,7 @@ class RoomMessageCodec<M: IMessage>(
  * Don't forget to call this method in the very vertx's initialization process.
  */
 fun registerCodecs(bus: EventBus) {
+    bus.registerDefaultCodec(EnemyConnectedMessage::class.java, RoomMessageCodec(EnemyConnectedMessage::class.java))
     bus.registerDefaultCodec(EnemyDisconnectedMessage::class.java, RoomMessageCodec(EnemyDisconnectedMessage::class.java))
     bus.registerDefaultCodec(GameStartedMessage::class.java, RoomMessageCodec(GameStartedMessage::class.java))
     bus.registerDefaultCodec(RoundEndsMessage::class.java, RoomMessageCodec(RoundEndsMessage::class.java))

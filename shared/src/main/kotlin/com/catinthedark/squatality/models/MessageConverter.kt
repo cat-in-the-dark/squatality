@@ -17,6 +17,7 @@ object MessageConverter {
 
     private fun registerMessages(register: Register) {
         register.addAll(listOf(
+            EnemyConnectedMessage::class.java,
             EnemyDisconnectedMessage::class.java,
             GameStartedMessage::class.java,
             RoundEndsMessage::class.java,
