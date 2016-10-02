@@ -36,7 +36,8 @@ class RemoteMovementSystem(
                 State.RUNNING
             }
             send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
-            rtc.reset()
+            rtc.velocity.setZero()
+            rtc.lastSync = 0f
         }
     }
 }
