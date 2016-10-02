@@ -47,8 +47,8 @@ class RoomVerticle: AbstractVerticle() {
     private fun helloHandler(msg: Message<HelloMessage>) {
         val clientID = clientFromHeaders(msg) ?: return
         val body = msg.body() ?: return
-        service.onNewClient(body, clientID)
-        sendToClient(Addressing.onGameStarted(), GameStartedMessage(clientID), clientID)
+        val id = service.onNewClient(body, clientID) ?: return
+        sendToClient(Addressing.onGameStarted(), GameStartedMessage(id), clientID)
     }
 
     private fun throwBrickHandler(msg: Message<ThrowBrickMessage>) {

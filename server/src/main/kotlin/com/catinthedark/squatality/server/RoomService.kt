@@ -23,11 +23,11 @@ class RoomService(
     private var time: Long = 0
     private val intersect = IntersectService()
 
-    fun onNewClient(msg: HelloMessage, clientID: UUID) {
+    fun onNewClient(msg: HelloMessage, clientID: UUID): UUID? {
         if (hasFreePlace()) {
             val pos = Const.Balance.randomSpawn()
             val player = Player(PlayerModel(
-                id = UUID.randomUUID(),
+                id = clientID,
                 name = msg.name,
                 x = pos.x,
                 y = pos.y,
@@ -36,7 +36,9 @@ class RoomService(
                 skin = Const.UI.randomSkin()))
             players[clientID] = player
             initializeBricks()
+            return clientID
         }
+        return null
     }
 
     fun onMove(msg: MoveMessage, clientID: UUID) {
