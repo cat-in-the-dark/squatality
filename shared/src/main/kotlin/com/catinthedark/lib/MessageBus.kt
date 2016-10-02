@@ -1,5 +1,7 @@
 package com.catinthedark.lib
 
+import org.slf4j.LoggerFactory
+
 /**
  * MessageBus is a class to connect systems.
  * The way how systems actually connected is defined in [Transport] implementations.
@@ -9,12 +11,18 @@ package com.catinthedark.lib
 class MessageBus(
     private val transport: Transport
 ) {
+    private val log = LoggerFactory.getLogger(MessageBus::class.java)
     private val subscribers: MutableMap<Class<out IMessage>, MutableList<(Any) -> Unit>> = hashMapOf()
 
     init {
         transport.setReceiver { msg ->
-            subscribers[msg.javaClass]?.forEach { subscriber ->
-                subscriber(msg)
+            val subs = subscribers[msg.javaClass]
+            if (subs == null || subs.isEmpty()) {
+                log.warn("There is no subscriber for ${msg.javaClass.canonicalName}")
+            } else {
+                subs.forEach { subscriber ->
+                    subscriber(msg)
+                }
             }
         }
     }
@@ -34,7 +42,7 @@ class MessageBus(
      * @param callback function will be called if message of type T is received.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T: IMessage> subscribe(clazz: Class<T>, callback: (T) -> Unit) {
+    fun <T : IMessage> subscribe(clazz: Class<T>, callback: (T) -> Unit) {
         subscribers
             .getOrPut(clazz, { arrayListOf() })
             .add(callback as (Any) -> Unit)

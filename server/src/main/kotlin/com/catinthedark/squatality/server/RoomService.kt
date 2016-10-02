@@ -92,8 +92,7 @@ class RoomService(
         processGameState()
         return players.map { me ->
             Pair(me.key, GameStateModel(
-                me = me.value.model,
-                players = players.filter { me.key != it.key }.values.map { it.model },
+                players = players.values.map { it.model },
                 bricks = bricks.map { it.model },
                 bonuses = bonuses,
                 time = time / 1000

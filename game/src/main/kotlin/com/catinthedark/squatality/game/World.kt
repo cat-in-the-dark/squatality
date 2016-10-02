@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.catinthedark.squatality.game.components.*
+import java.util.*
 
 class World(
     private val engine: Engine,
@@ -24,7 +25,7 @@ class World(
         })
     }
 
-    fun createPlayer(x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
+    fun createPlayer(id: UUID, x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
         return with(engine.createEntity(), {
             val ac = engine.createComponent(AnimationComponent::class.java)
             val tc = engine.createComponent(TextureComponent::class.java)
@@ -32,14 +33,17 @@ class World(
             val trc = engine.createComponent(TransformComponent::class.java)
             val mc = engine.createComponent(MoveComponent::class.java)
             val aimC = engine.createComponent(AimComponent::class.java)
+            val rmc = engine.createComponent(RemoteMoveComponent::class.java)
+            val ric = engine.createComponent(RemoteIDComponent::class.java)
 
+            ric.id = id
             ac.animations["IDLE"] = skin.idle
             ac.animations["RUNNING"] = skin.running
             ac.animations["KILLED"] = skin.killed
             ac.animations["THROWING"] = skin.throwing
             ac.animations["RUNNING_WITH_BRICK"] = skin.runningWithBrick
             ac.animations["IDLE_WITH_BRICK"] = skin.idleWithBrick
-            sc.state = "RUNNING"
+            sc.state = "IDLE"
 
             trc.pos.x = x
             trc.pos.y = y
@@ -52,6 +56,8 @@ class World(
             add(trc)
             add(mc)
             add(aimC)
+            add(rmc)
+            add(ric)
         })
     }
 
@@ -84,7 +90,7 @@ class World(
         }
     }
 
-    fun createAimKnob(x: Float, y: Float, ac: AimComponent, hudStage: Stage) : Entity {
+    fun createAimKnob(x: Float, y: Float, ac: AimComponent, hudStage: Stage): Entity {
         return engine.createEntity().apply {
             val kc = engine.createComponent(KnobComponent::class.java)
             kc.touchPad = Touchpad(10f,

@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.game
 
 import java.net.URI
+import java.util.*
 
 object Const {
     object Screen {
@@ -15,5 +16,13 @@ object Const {
 
     object Network {
         val server: URI = URI.create("https://squatality-test.herokuapp.com/")
+        val tickRate = 20f
+        val syncDelay: Float = 1f / tickRate
     }
+
+    object Names {
+        private val names = listOf("Anon", "Anonas", "Anton", "Antonina", "Nanas", "Adidos", "Pipos", "Mimos", "Pisos", "Anonim", "Antonim", "Zasos", "Abibas", "Bibos", "Poltos")
+        fun random() = names[Random().nextInt(names.size)]
+    }
+
 }

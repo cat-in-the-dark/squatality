@@ -6,7 +6,6 @@ import java.util.*
 interface Model : Serializable
 
 data class GameStateModel(
-    val me: PlayerModel,
     val players: List<PlayerModel>,
     val bricks: List<BrickModel>,
     val bonuses: List<BonusModel>,

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.MoveComponent
+import com.catinthedark.squatality.game.components.StateComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 
 class LocalMovementSystem : IteratingSystem(

@@ -8,7 +8,7 @@ import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.CameraComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 
-class CameraSystem(
+class FollowCameraSystem(
     private val cam: Camera
 ) : IteratingSystem(
     Family.all(CameraComponent::class.java, TransformComponent::class.java).get()
