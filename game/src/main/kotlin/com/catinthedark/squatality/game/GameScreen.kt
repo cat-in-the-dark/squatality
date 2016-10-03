@@ -20,7 +20,7 @@ class GameScreen(
     private lateinit var world: World
 
     override fun onActivate(data: AssetManager) {
-        println("GameScreen started")
+        Gdx.app.log("GameScreen", "GameScreen started")
         world = World(engine, data)
         engine.addSystem(RenderingSystem(stage, hudStage))
         engine.addSystem(AnimationSystem())

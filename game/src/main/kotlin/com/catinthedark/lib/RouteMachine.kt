@@ -1,6 +1,9 @@
 package com.catinthedark.lib
 
+import org.slf4j.LoggerFactory
+
 class RouteMachine {
+    private val log = LoggerFactory.getLogger(RouteMachine::class.java)
     private val routes: MutableMap<YieldUnit<*, *>, (Any) -> YieldUnit<Any, *>> = hashMapOf()
     private lateinit var current: YieldUnit<*, *>
 
@@ -23,12 +26,12 @@ class RouteMachine {
 
     private fun doRoute(data: Any) {
         val from = current
-        println("Begin transition from $from")
+        log.info("Begin transition from $from")
         from.onExit()
         val routeFn = routes[from] ?: throw Exception("Could not find route function from $from")
         val to = routeFn(data)
         to.onActivate(data)
-        println("End transition to $to")
+        log.info("End transition to $to")
         current = to
     }
 }
