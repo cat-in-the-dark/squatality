@@ -9,8 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 
 class PerformanceSystem(
-    private val hudStage: Stage
-) : IntervalSystem(0.03f) {
+    private val hudStage: Stage,
+    private val syncDelta: () -> Long
+) : IntervalSystem(0.1f) {
     private val font = BitmapFont()
     private val label = Label(" ", Label.LabelStyle(font, Color.WHITE))
 
@@ -22,6 +23,6 @@ class PerformanceSystem(
     }
 
     override fun updateInterval() {
-        label.setText(" FPS: ${Gdx.graphics.framesPerSecond}")
+        label.setText(" FPS: ${Gdx.graphics.framesPerSecond}\t SyncDelta: ${syncDelta()}")
     }
 }

@@ -9,6 +9,7 @@ import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
+import io.socket.thread.EventThread
 
 class GameScreen(
     private val stage: Stage,
@@ -16,7 +17,6 @@ class GameScreen(
 ) : YieldUnit<AssetManager, Any> {
     private val engine = PooledEngine()
     private val nc = NetworkControl(Const.Network.server)
-    private lateinit var ncThread: Thread
     private lateinit var world: World
 
     override fun onActivate(data: AssetManager) {
@@ -27,12 +27,13 @@ class GameScreen(
         engine.addSystem(StateSystem())
         //engine.addSystem(LocalMovementSystem())
         engine.addSystem(RemoteMovementSystem(nc.sender))
-        engine.addSystem(RemoteControlSystem(nc.onGameState))
+        val rcs = RemoteControlSystem(nc.onGameState)
+        engine.addSystem(rcs)
         //engine.addSystem(RandomControlSystem())
         engine.addSystem(KnobMovementSystem())
         engine.addSystem(KnobAimSystem())
         engine.addSystem(FollowCameraSystem(stage.camera))
-        engine.addSystem(PerformanceSystem(hudStage))
+        engine.addSystem(PerformanceSystem(hudStage, rcs.getSyncDelta))
 
         engine.addEntity(world.createField())
 
@@ -54,8 +55,7 @@ class GameScreen(
         }
 
         Gdx.input.inputProcessor = hudStage
-        ncThread = Thread(nc)
-        ncThread.start()
+        EventThread.exec(nc)
     }
 
     override fun run(delta: Float): Any? {
@@ -67,6 +67,5 @@ class GameScreen(
         engine.removeAllEntities()
         stage.dispose()
         nc.dispose()
-        ncThread.interrupt()
     }
 }
