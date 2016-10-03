@@ -12,8 +12,8 @@ class LocalMovementSystem : IteratingSystem(
     Family.all(MoveComponent::class.java, TransformComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val mc = Mappers.movement[entity]
-        val tc = Mappers.transform[entity]
+        val mc = Mappers.movement[entity] ?: return
+        val tc = Mappers.transform[entity] ?: return
 
         tc.pos.x += deltaTime * mc.velocity.x
         tc.pos.y += deltaTime * mc.velocity.y

@@ -11,12 +11,11 @@ class KnobMovementSystem(): IteratingSystem(
     Family.all(KnobComponent::class.java, MoveComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val kc = Mappers.knob[entity]
-        val mc = Mappers.movement[entity]
-        val tp = kc.touchPad
-        if (tp != null) {
-            mc.velocity.x = tp.knobPercentX * mc.acceleration.x
-            mc.velocity.y = tp.knobPercentY * mc.acceleration.y
-        }
+        val kc = Mappers.knob[entity] ?: return
+        val mc = Mappers.movement[entity] ?: return
+        val tp = kc.touchPad ?: return
+
+        mc.velocity.x = tp.knobPercentX * mc.acceleration.x
+        mc.velocity.y = tp.knobPercentY * mc.acceleration.y
     }
 }

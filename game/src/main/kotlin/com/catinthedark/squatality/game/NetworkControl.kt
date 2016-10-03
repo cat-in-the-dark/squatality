@@ -61,6 +61,7 @@ class NetworkControl(serverAddress: URI): Runnable {
     }
 
     override fun run() {
+        Gdx.app.log(TAG, "Connecting")
         transport.connect()
     }
 

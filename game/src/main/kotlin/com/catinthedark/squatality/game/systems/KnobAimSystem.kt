@@ -11,11 +11,9 @@ class KnobAimSystem(): IteratingSystem(
     Family.all(KnobComponent::class.java, AimComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val kc = Mappers.knob[entity]
-        val ac = Mappers.aim[entity]
-        val tp = kc.touchPad
-        if (tp != null) {
-            // do some here
-        }
+        val kc = Mappers.knob[entity] ?: return
+        val ac = Mappers.aim[entity] ?: return
+        val tp = kc.touchPad ?: return
+        // do some stuff
     }
 }

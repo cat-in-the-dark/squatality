@@ -32,6 +32,7 @@ class GameScreen(
         engine.addSystem(KnobMovementSystem())
         engine.addSystem(KnobAimSystem())
         engine.addSystem(FollowCameraSystem(stage.camera))
+        engine.addSystem(PerformanceSystem(hudStage))
 
         engine.addEntity(world.createField())
 

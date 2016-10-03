@@ -12,13 +12,11 @@ class AnimationSystem: IteratingSystem(
     Family.all(TextureComponent::class.java, AnimationComponent::class.java, StateComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val tex = Mappers.texture[entity]
-        val anim = Mappers.animation[entity]
-        val state = Mappers.state[entity]
+        val tex = Mappers.texture[entity] ?: return
+        val anim = Mappers.animation[entity] ?: return
+        val state = Mappers.state[entity] ?: return
 
-        val animation = anim.animations[state.state]
-        if (animation != null) {
-            tex.region = animation.getKeyFrame(state.time)
-        }
+        val animation = anim.animations[state.state] ?: return
+        tex.region = animation.getKeyFrame(state.time)
     }
 }

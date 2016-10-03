@@ -14,8 +14,8 @@ class FollowCameraSystem(
     Family.all(CameraComponent::class.java, TransformComponent::class.java).get()
 ) {
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val targetC = Mappers.transform[entity]
-        val camC = Mappers.camera[entity]
+        val targetC = Mappers.transform[entity] ?: return
+        val camC = Mappers.camera[entity] ?: return
 
         if (targetC.pos.x - camC.leftBottomCorner.x > cam.viewportWidth / 2) {
             if (camC.rightUpperCorner.x - targetC.pos.x > cam.viewportWidth / 2) {
