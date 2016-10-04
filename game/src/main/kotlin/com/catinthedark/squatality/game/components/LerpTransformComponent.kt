@@ -4,9 +4,10 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Pool
 import com.catinthedark.lib.collections.WeightedQueue
+import com.catinthedark.squatality.game.Const
 
 data class LerpTransformComponent(
-    val queue: WeightedQueue<LerpTransformElement> = WeightedQueue(100)
+    val queue: WeightedQueue<LerpTransformElement> = WeightedQueue(Const.Network.lerpDelay)
 ) : Component, Pool.Poolable {
     override fun reset() {
         queue.clear()

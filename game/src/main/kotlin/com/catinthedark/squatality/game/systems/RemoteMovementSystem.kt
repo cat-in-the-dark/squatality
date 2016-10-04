@@ -42,6 +42,6 @@ class RemoteMovementSystem(
         }
         send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
         rtc.velocity.setZero()
-        rtc.lastSync = 0f
+        rtc.lastSync -= Const.Network.syncDelay
     }
 }
