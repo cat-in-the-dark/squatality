@@ -1,0 +1,55 @@
+{
+    "project_info": {
+        "project_number": "877962864514",
+        "firebase_url": "https://squatality-11624608.firebaseio.com",
+        "project_id": "squatality-11624608",
+        "storage_bucket": "squatality-11624608.appspot.com"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:877962864514:android:d1857210f33cc1ab",
+                "android_client_info": {
+                    "package_name": "com.catinthedark.squatality.android"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "877962864514-cp0n6nr7fclpjfugrkgou9lklttsb3ob.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.catinthedark.squatality.android",
+                        "certificate_hash": "50A5F64D7A3BBC8F5BDCF9EF9F94BBC4CECDA7C4"
+                    }
+                },
+                {
+                    "client_id": "877962864514-42v9iif5frdohecs4o5gn7n8bp1g3hi2.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyBpfhxr1NQKEgWV6mc0_aA77ODCV_zp-14"
+                }
+            ],
+            "services": {
+                "analytics_service": {
+                    "status": 1
+                },
+                "appinvite_service": {
+                    "status": 2,
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "877962864514-42v9iif5frdohecs4o5gn7n8bp1g3hi2.apps.googleusercontent.com",
+                            "client_type": 3
+                        }
+                    ]
+                },
+                "ads_service": {
+                    "status": 2
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
