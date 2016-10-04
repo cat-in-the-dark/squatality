@@ -33,7 +33,7 @@ class RemoteControlSystem(
             val now = System.nanoTime()
             syncDelta = now - lastSyncTime
             lastSyncTime = now
-            gameStates.add(Pair(state, getSyncDelta()))
+            gameStates.add(Pair(state, TimeUtils.nanosToMillis(syncDelta)))
         }
     }
 
