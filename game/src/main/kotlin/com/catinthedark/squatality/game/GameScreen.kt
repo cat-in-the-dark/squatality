@@ -26,7 +26,8 @@ class GameScreen(
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
         //engine.addSystem(LocalMovementSystem())
-        engine.addSystem(LerpSystem())
+        val ls = LerpSystem()
+        engine.addSystem(ls)
         engine.addSystem(RemoteMovementSystem(nc.sender))
         val rcs = RemoteControlSystem(nc.onGameState)
         engine.addSystem(rcs)
@@ -34,7 +35,7 @@ class GameScreen(
         engine.addSystem(KnobMovementSystem())
         engine.addSystem(KnobAimSystem())
         engine.addSystem(FollowCameraSystem(stage.camera))
-        engine.addSystem(PerformanceSystem(hudStage, rcs.getSyncDelta))
+        engine.addSystem(PerformanceSystem(hudStage, rcs.getSyncDelta, ls.getLerpDelay))
 
         engine.addEntity(world.createField())
 
