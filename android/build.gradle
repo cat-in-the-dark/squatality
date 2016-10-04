@@ -14,6 +14,9 @@ buildscript {
 }
 
 android {
+    signingConfigs {
+        release
+    }
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
     productFlavors {
@@ -36,8 +39,11 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            signingConfig signingConfigs.release
+            zipAlignEnabled true
         }
     }
     sourceSets {
@@ -49,6 +55,9 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/LICENSE'
+    }
+    lintOptions {
+        warning 'InvalidPackage'
     }
 }
 
@@ -103,4 +112,17 @@ task copyAndroidNatives() {
             }
         }
     }
+}
+
+if (project.hasProperty('storeFile')) {
+    android.signingConfigs.release.storeFile = file(storeFile)
+}
+if (project.hasProperty('storePassword')) {
+    android.signingConfigs.release.storePassword = storePassword
+}
+if (project.hasProperty('keyAlias')) {
+    android.signingConfigs.release.keyAlias = keyAlias
+}
+if (project.hasProperty('keyPassword')) {
+    android.signingConfigs.release.keyPassword = keyPassword
 }

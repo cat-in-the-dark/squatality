@@ -2,8 +2,7 @@ package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IMessage
 import com.catinthedark.squatality.models.*
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.google.gson.Gson
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.EventBus
 import io.vertx.core.eventbus.MessageCodec
@@ -16,15 +15,15 @@ import io.vertx.core.eventbus.MessageCodec
  * About out boundaries. I specify that this codec works only and only with IMessage.
  * This is the way of avoiding strange errors.
  */
-class RoomMessageCodec<M: IMessage>(
+class RoomMessageCodec<M : IMessage>(
     val clazz: Class<M>
-) : MessageCodec<M, M>  {
-    val mapper = ObjectMapper().registerKotlinModule()
+) : MessageCodec<M, M> {
+    val mapper = Gson()
 
     override fun decodeFromWire(pos: Int, buffer: Buffer): M {
         val size = buffer.getInt(pos)
         val json = buffer.getString(pos + 4, pos + 4 + size) // because of Int
-        return mapper.readValue(json, clazz)
+        return mapper.fromJson(json, clazz)
     }
 
     override fun transform(msg: M): M {
@@ -32,7 +31,7 @@ class RoomMessageCodec<M: IMessage>(
     }
 
     override fun encodeToWire(buffer: Buffer, msg: M) {
-        val json: String = mapper.writeValueAsString(msg)
+        val json: String = mapper.toJson(msg)
         buffer.appendInt(json.toByteArray().size)
         buffer.appendString(json)
     }
