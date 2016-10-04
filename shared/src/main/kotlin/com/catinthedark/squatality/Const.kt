@@ -5,10 +5,10 @@ import java.util.*
 
 object Const {
     object UI {
-        val horizontalBorderWidth = 80f
-        val verticalBorderWidth = 40f
-        val fieldWidth = 1280f
-        val fieldHeight = 720f
+        val horizontalBorderWidth = 235f
+        val verticalBorderWidth = 235f
+        val fieldWidth = 1081f
+        val fieldHeight = 652f
 
         val playerSkinNames = listOf(
             "gop_black",
@@ -38,7 +38,7 @@ object Const {
         val brickFriction = 1f
         val spawnPoints: List<Vector2> = (2..9).flatMap { x ->
             (1..6).map { y ->
-                Vector2(x * 100f, y * 100f)
+                Vector2(UI.verticalBorderWidth + x * 100f, UI.horizontalBorderWidth + y * 100f)
             }
         }
 
