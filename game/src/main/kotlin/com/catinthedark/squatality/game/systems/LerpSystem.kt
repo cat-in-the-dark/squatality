@@ -15,9 +15,8 @@ class LerpSystem: IteratingSystem(
         val tc = Mappers.transform[entity] ?: return
         val lrc = Mappers.lerpTransform[entity] ?: return
         val el = lrc.queue.poll(TimeConverter.secondsToMillis(deltaTime)) ?: return
-        println("${lrc.queue.weight()}")
-        tc.pos.x = el.pos.x
-        tc.pos.y = el.pos.y
-        tc.angle = el.angle
+        println("${lrc.queue.weight()} ${el.percentage()}")
+        tc.angle = el.payload.angle
+        tc.pos.lerp(el.payload.pos, el.percentage())
     }
 }

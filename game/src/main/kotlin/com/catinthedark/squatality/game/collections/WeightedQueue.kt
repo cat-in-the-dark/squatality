@@ -10,7 +10,7 @@ class WeightedQueue<T> {
             payload = element))
     }
 
-    fun poll(weight: Long): T? {
+    fun poll(weight: Long): Weighted<T>? {
         var haveWeight = weight
         val elements = collection.takeWhile { el ->
             val need = el.needSync()
@@ -29,7 +29,7 @@ class WeightedQueue<T> {
             if (it.actualWeight >= it.weight) collection.remove(it)
         }
 
-        return elements.lastOrNull()?.payload
+        return elements.lastOrNull()
     }
 
     fun weight(): Long {
@@ -47,5 +47,9 @@ class WeightedQueue<T> {
         val payload: T
     ) {
         fun needSync() = weight - actualWeight
+        fun percentage(): Float {
+            if (weight == 0L) return 1f
+            return actualWeight.toFloat() / weight.toFloat()
+        }
     }
 }
