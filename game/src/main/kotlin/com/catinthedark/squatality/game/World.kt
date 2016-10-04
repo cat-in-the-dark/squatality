@@ -26,6 +26,7 @@ class World(
             val sc = engine.createComponent(StateComponent::class.java)
             val trc = engine.createComponent(TransformComponent::class.java)
             val ric = engine.createComponent(RemoteIDComponent::class.java)
+            val ltc = engine.createComponent(LerpTransformComponent::class.java)
 
             ric.id = id
             ac.animations[State.IDLE.name] = skin.idle
@@ -45,6 +46,7 @@ class World(
             add(sc)
             add(trc)
             add(ric)
+            add(ltc)
         })
     }
 

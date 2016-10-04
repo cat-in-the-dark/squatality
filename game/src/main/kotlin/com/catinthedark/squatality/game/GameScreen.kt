@@ -26,6 +26,7 @@ class GameScreen(
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
         //engine.addSystem(LocalMovementSystem())
+        engine.addSystem(LerpSystem())
         engine.addSystem(RemoteMovementSystem(nc.sender))
         val rcs = RemoteControlSystem(nc.onGameState)
         engine.addSystem(rcs)

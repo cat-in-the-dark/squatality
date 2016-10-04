@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.catinthedark.squatality.game.components.*
 
 object Mappers {
+    val lerpTransform = ComponentMapper.getFor(LerpTransformComponent::class.java)!!
     val transform = ComponentMapper.getFor(TransformComponent::class.java)!!
     val texture = ComponentMapper.getFor(TextureComponent::class.java)!!
     val camera = ComponentMapper.getFor(CameraComponent::class.java)!!

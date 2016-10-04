@@ -29,15 +29,19 @@ class RemoteMovementSystem(
             rtc.angle = mc.velocity.angle() - 90
         }
 
-        if (rtc.lastSync > Const.Network.syncDelay) {
-            val state = if (rtc.velocity.isZero) {
-                State.IDLE
-            } else {
-                State.RUNNING
-            }
-            send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
-            rtc.velocity.setZero()
-            rtc.lastSync = 0f
+        sync(rtc)
+    }
+
+    private fun sync(rtc: RemoteMoveComponent) {
+        if (rtc.lastSync < Const.Network.syncDelay) return
+
+        val state = if (rtc.velocity.isZero) {
+            State.IDLE
+        } else {
+            State.RUNNING
         }
+        send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
+        rtc.velocity.setZero()
+        rtc.lastSync = 0f
     }
 }
