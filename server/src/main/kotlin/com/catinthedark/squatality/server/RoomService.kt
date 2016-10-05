@@ -47,6 +47,7 @@ class RoomService(
 
     fun onMove(msg: MoveMessage, clientID: UUID) {
         val player = players[clientID] ?: return
+        player.model.updated = true
         if (player.model.state != State.KILLED) {
             player.model.x += msg.speedX
             player.model.y += msg.speedY
@@ -98,14 +99,18 @@ class RoomService(
         if (players.isEmpty()) return emptyList()
         time += delta
         processGameState()
-        return players.map { me ->
+        val models =  players.map { me ->
             Pair(me.key, GameStateModel(
-                players = players.values.map { it.model },
-                bricks = bricks.map { it.model },
+                players = players.values.map { it.model.copy() },
+                bricks = bricks.map { it.model.copy() },
                 bonuses = bonuses,
                 time = time / 1000
             ))
         }
+
+        players.forEach { it.value.model.updated = false }
+
+        return models
     }
 
     fun onSpawnBonus() {

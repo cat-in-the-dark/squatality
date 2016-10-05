@@ -14,6 +14,7 @@ data class GameStateModel(
 data class PlayerModel(
     val id: UUID,
     val name: String,
+    var updated: Boolean = true,
     var x: Float,
     var y: Float,
     var angle: Float,
