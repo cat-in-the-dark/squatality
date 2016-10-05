@@ -52,10 +52,14 @@ class RemoteControlSystem(
                 val rc = Mappers.remote.id[entity] ?: return@forEach
                 val ltc = Mappers.lerpTransform[entity] ?: return@forEach
                 val target = gs.players.find { it.id == rc.id } ?: return@forEach
-                ltc.queue.add(LerpTransformElement(
-                    pos = Vector3(target.x, target.y, 0f),
-                    angle = target.angle
-                ), delay)
+                if (target.updated) {
+                    ltc.queue.add(LerpTransformElement(
+                        pos = Vector3(target.x, target.y, 0f),
+                        angle = target.angle
+                    ), ltc.syncDelta)
+                    ltc.syncDelta = 0L
+                }
+                ltc.syncDelta += delay
                 sc.state = target.state.name
             }
         }

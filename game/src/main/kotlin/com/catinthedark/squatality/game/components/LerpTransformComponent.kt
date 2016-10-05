@@ -7,7 +7,8 @@ import com.catinthedark.lib.collections.WeightedQueue
 import com.catinthedark.squatality.game.Const
 
 data class LerpTransformComponent(
-    val queue: WeightedQueue<LerpTransformElement> = WeightedQueue(Const.Network.lerpDelay)
+    val queue: WeightedQueue<LerpTransformElement> = WeightedQueue(Const.Network.lerpDelay),
+    var syncDelta: Long = 0L
 ) : Component, Pool.Poolable {
     override fun reset() {
         queue.clear()
