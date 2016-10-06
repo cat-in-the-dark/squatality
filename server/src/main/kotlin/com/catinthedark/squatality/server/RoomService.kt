@@ -50,10 +50,6 @@ class RoomService(
     fun onMove(msg: MoveMessage, clientID: UUID) {
         val player = players[clientID] ?: return
         if (player.model.state != State.KILLED) {
-            if (!player.model.updated) {
-                player.model.previousX = player.model.x
-                player.model.previousY = player.model.y
-            }
             player.model.x += msg.speedX
             player.model.y += msg.speedY
             player.model.angle = msg.angle
@@ -114,7 +110,11 @@ class RoomService(
             ))
         }
 
-        players.forEach { it.value.model.updated = false }
+        players.forEach {
+            it.value.model.previousX = it.value.model.x
+            it.value.model.previousY = it.value.model.y
+            it.value.model.updated = false
+        }
 
         return models
     }
