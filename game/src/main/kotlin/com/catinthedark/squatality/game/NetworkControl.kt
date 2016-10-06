@@ -16,6 +16,8 @@ class NetworkControl(serverAddress: URI): Runnable {
         MessageConverter.register(SocketIOTransport.ReConnectMessage::class.java)
     }
 
+    val onConnected = Observable<SocketIOTransport.ConnectMessage>()
+    val onServerHello = Observable<ServerHelloMessage>()
     val onGameState = Observable<GameStateModel>()
     val onGameStarted = Observable<GameStartedMessage>()
     val onEnemyConnected = Observable<EnemyConnectedMessage>()
@@ -29,6 +31,7 @@ class NetworkControl(serverAddress: URI): Runnable {
     private val messageBus = MessageBus(transport).apply {
         subscribe(SocketIOTransport.ConnectMessage::class.java, {
             Gdx.app.log(TAG, "Connected ${it.id}")
+            onConnected(it)
         })
         subscribe(SocketIOTransport.ConnectErrorMessage::class.java, {
             Gdx.app.log(TAG, "Connection error")
@@ -45,7 +48,7 @@ class NetworkControl(serverAddress: URI): Runnable {
         })
         subscribe(ServerHelloMessage::class.java, {
             Gdx.app.log(TAG, "$it")
-            send(HelloMessage(Const.Names.random()))
+            onServerHello(it)
         })
         subscribe(GameStateMessage::class.java, {
             onGameState(it.gameStateModel)

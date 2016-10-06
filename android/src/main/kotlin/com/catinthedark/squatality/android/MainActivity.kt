@@ -1,7 +1,6 @@
 package com.catinthedark.squatality.android
 
 import android.os.Bundle
-import android.os.StrictMode
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.catinthedark.squatality.game.SquatalityGame

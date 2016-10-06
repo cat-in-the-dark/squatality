@@ -9,14 +9,13 @@ import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
-import io.socket.thread.EventThread
 
 class GameScreen(
     private val stage: Stage,
-    private val hudStage: Stage
+    private val hudStage: Stage,
+    private val nc: NetworkControl
 ) : YieldUnit<AssetManager, Any> {
     private val engine = PooledEngine()
-    private val nc = NetworkControl(Const.Network.server)
     private lateinit var world: World
 
     override fun onActivate(data: AssetManager) {
@@ -57,7 +56,6 @@ class GameScreen(
         }
 
         Gdx.input.inputProcessor = hudStage
-        EventThread.exec(nc)
     }
 
     override fun run(delta: Float): Any? {

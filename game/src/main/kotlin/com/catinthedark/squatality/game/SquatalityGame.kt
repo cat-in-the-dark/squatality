@@ -10,8 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.FillViewport
 import com.catinthedark.lib.RouteMachine
+import java.net.URI
 
-class SquatalityGame : Game() {
+class SquatalityGame(
+    private val serverAddress: URI = Const.Network.server
+) : Game() {
     private val rm = RouteMachine()
 
     private lateinit var stage: Stage
@@ -28,12 +31,15 @@ class SquatalityGame : Game() {
             Const.Screen.HEIGHT / Const.Screen.ZOOM,
             OrthographicCamera()), SpriteBatch())
 
+        val nc = NetworkControl(serverAddress)
         val splash = SplashScreen(hudStage)
         val title = TitleScreen(hudStage)
-        val game = GameScreen(stage, hudStage)
+        val pairing = PairingScreen(hudStage, nc)
+        val game = GameScreen(stage, hudStage, nc)
 
         rm.addRoute(splash, { title })
-        rm.addRoute(title, { game })
+        rm.addRoute(title, { pairing })
+        rm.addRoute(pairing, { game })
         rm.start(splash, Unit)
     }
 
