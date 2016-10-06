@@ -1,4 +1,4 @@
-package com.catinthedark.squatality.game
+package com.catinthedark.squatality.game.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
+import com.catinthedark.squatality.game.Assets
 
 class SplashScreen(
     private val stage: Stage

@@ -1,10 +1,13 @@
-package com.catinthedark.squatality.game
+package com.catinthedark.squatality.game.screens
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
+import com.catinthedark.squatality.game.Assets
+import com.catinthedark.squatality.game.Const
+import com.catinthedark.squatality.game.NetworkControl
 import com.catinthedark.squatality.models.HelloMessage
 import com.catinthedark.squatality.models.ServerHelloMessage
 import io.socket.thread.EventThread

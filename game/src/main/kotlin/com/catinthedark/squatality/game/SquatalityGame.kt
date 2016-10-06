@@ -2,14 +2,17 @@ package com.catinthedark.squatality.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.FPSLogger
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.FillViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.catinthedark.lib.RouteMachine
+import com.catinthedark.squatality.game.screens.GameScreen
+import com.catinthedark.squatality.game.screens.PairingScreen
+import com.catinthedark.squatality.game.screens.SplashScreen
+import com.catinthedark.squatality.game.screens.TitleScreen
 import java.net.URI
 
 class SquatalityGame(
@@ -26,7 +29,7 @@ class SquatalityGame(
             Const.Screen.HEIGHT / Const.Screen.ZOOM,
             OrthographicCamera()), SpriteBatch())
 
-        hudStage = Stage(ExtendViewport(
+        hudStage = Stage(FitViewport(
             Const.Screen.WIDTH / Const.Screen.ZOOM,
             Const.Screen.HEIGHT / Const.Screen.ZOOM,
             OrthographicCamera()), SpriteBatch())

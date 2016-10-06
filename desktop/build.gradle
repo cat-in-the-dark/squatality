@@ -1,5 +1,8 @@
+def gitCommitCount =
+    Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+
 group 'com.catinthedark.squatality'
-version '1.0-SNAPSHOT'
+version "$gitCommitCount-SNAPSHOT"
 
 buildscript {
     dependencies {

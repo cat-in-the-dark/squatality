@@ -20,10 +20,9 @@ class LerpSystem : IteratingSystem(
         val tc = Mappers.transform[entity] ?: return
         val lrc = Mappers.lerpTransform[entity] ?: return
         val elements = lrc.queue.pollWithOverweight(TimeConverter.secondsToMillis(deltaTime))
-//        Gdx.app.log("LerpSystem", "${elements.size} ${lrc.queue.weight()} ${lrc.queue.size}")
         lerpDelay = lrc.queue.weight()
         elements.forEach { el ->
-            Gdx.app.log("LerpSystem", "W:${el.weight} P:${el.percentage()}")
+//            Gdx.app.log("LerpSystem", "W:${el.weight} P:${el.percentage()}")
             tc.angle = MathUtils.lerpAngleDeg(tc.angle, el.payload.angle, el.percentage())
             tc.pos.x = MathUtils.lerp(el.payload.prevPos.x, el.payload.pos.x, el.percentage())
             tc.pos.y = MathUtils.lerp(el.payload.prevPos.y, el.payload.pos.y, el.percentage())

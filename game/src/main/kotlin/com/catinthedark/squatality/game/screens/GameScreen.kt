@@ -1,10 +1,13 @@
-package com.catinthedark.squatality.game
+package com.catinthedark.squatality.game.screens
 
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
+import com.catinthedark.squatality.game.Assets
+import com.catinthedark.squatality.game.NetworkControl
+import com.catinthedark.squatality.game.World
 import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
@@ -41,8 +44,8 @@ class GameScreen(
         nc.onGameStarted.subscribe { gsm ->
             val mainPlayerComponent = world.createPlayer(gsm.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.BLUE)))
             engine.addEntity(mainPlayerComponent)
-            engine.addEntity(world.createMovementKnob(15f, 15f, mainPlayerComponent.getComponent(MoveComponent::class.java), hudStage))
-            engine.addEntity(world.createAimKnob(1015f, 15f, mainPlayerComponent.getComponent(AimComponent::class.java), hudStage))
+            engine.addEntity(world.createMovementKnob(20f, 20f, mainPlayerComponent.getComponent(MoveComponent::class.java), hudStage))
+            engine.addEntity(world.createAimKnob(1010f, 20f, mainPlayerComponent.getComponent(AimComponent::class.java), hudStage))
             engine.addEntity(world.createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
             gsm.enemies.forEach { enemyId ->
                 val enemy = world.createUnit(enemyId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
