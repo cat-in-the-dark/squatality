@@ -14,7 +14,7 @@ class WeightedQueue<T>(
 
     fun pollOverweight(): List<Weighted<T>> {
         if (weight() > overweight) {
-            return poll(weight() - overweight)
+            return poll((weight() - overweight) * 3)
         }
         return emptyList()
     }

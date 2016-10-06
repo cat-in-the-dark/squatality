@@ -16,6 +16,7 @@ object Const {
 
     object Network {
         val server: URI = URI.create("https://squatality-test.herokuapp.com/")
+        //val server: URI = URI.create("http://localhost:8080/")
         val tickRate = 15f
         val syncDelay: Float = 1f / tickRate // in seconds
         /**
@@ -25,7 +26,7 @@ object Const {
          * Using WiFi we have msg delay of 60-120ms, so lerpDelay should not be reached
          * This const can me player-configurable prior to his skills and decision - sharp or smooth game.
          */
-        val lerpDelay: Long = 500 // in ms
+        val lerpDelay: Long = 1500 // in ms
     }
 
     object Names {

@@ -49,15 +49,17 @@ class RoomService(
 
     fun onMove(msg: MoveMessage, clientID: UUID) {
         val player = players[clientID] ?: return
-        player.model.updated = true
         if (player.model.state != State.KILLED) {
-            player.model.previousX = player.model.x
-            player.model.previousY = player.model.y
+            if (!player.model.updated) {
+                player.model.previousX = player.model.x
+                player.model.previousY = player.model.y
+            }
             player.model.x += msg.speedX
             player.model.y += msg.speedY
             player.model.angle = msg.angle
             player.model.state = State.valueOf(msg.stateName)
         }
+        player.model.updated = true
     }
 
     fun onThrowBrick(msg: ThrowBrickMessage, clientID: UUID) {
