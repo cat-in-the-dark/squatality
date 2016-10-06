@@ -16,6 +16,7 @@ data class LerpTransformComponent(
 }
 
 data class LerpTransformElement(
+    val prevPos: Vector3 = Vector3(),
     val pos: Vector3 = Vector3(),
     var angle: Float = 0f
 )

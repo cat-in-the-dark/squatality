@@ -33,6 +33,8 @@ class RoomService(
             val player = Player(PlayerModel(
                 id = clientID,
                 name = msg.name,
+                previousX = pos.x,
+                previousY = pos.y,
                 x = pos.x,
                 y = pos.y,
                 angle = 0f,
@@ -49,6 +51,8 @@ class RoomService(
         val player = players[clientID] ?: return
         player.model.updated = true
         if (player.model.state != State.KILLED) {
+            player.model.previousX = player.model.x
+            player.model.previousY = player.model.y
             player.model.x += msg.speedX
             player.model.y += msg.speedY
             player.model.angle = msg.angle

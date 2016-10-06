@@ -15,6 +15,8 @@ data class PlayerModel(
     val id: UUID,
     val name: String,
     var updated: Boolean = true,
+    var previousX: Float,
+    var previousY: Float,
     var x: Float,
     var y: Float,
     var angle: Float,

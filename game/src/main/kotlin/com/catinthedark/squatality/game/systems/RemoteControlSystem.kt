@@ -54,6 +54,7 @@ class RemoteControlSystem(
                 val target = gs.players.find { it.id == rc.id } ?: return@forEach
                 if (target.updated) {
                     ltc.queue.add(LerpTransformElement(
+                        prevPos = Vector3(target.previousX, target.previousY, 0f),
                         pos = Vector3(target.x, target.y, 0f),
                         angle = target.angle
                     ), ltc.syncDelta)

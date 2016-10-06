@@ -3,6 +3,7 @@ package com.catinthedark.squatality.game.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.MathUtils
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.LerpTransformComponent
@@ -22,8 +23,10 @@ class LerpSystem : IteratingSystem(
 //        Gdx.app.log("LerpSystem", "${elements.size} ${lrc.queue.weight()} ${lrc.queue.size}")
         lerpDelay = lrc.queue.weight()
         elements.forEach { el ->
+            Gdx.app.log("LerpSystem", "W:${el.weight} P:${el.percentage()}")
             tc.angle = MathUtils.lerpAngleDeg(tc.angle, el.payload.angle, el.percentage())
-            tc.pos.lerp(el.payload.pos, el.percentage())
+            tc.pos.x = MathUtils.lerp(el.payload.prevPos.x, el.payload.pos.x, el.percentage())
+            tc.pos.y = MathUtils.lerp(el.payload.prevPos.y, el.payload.pos.y, el.percentage())
         }
     }
 }
