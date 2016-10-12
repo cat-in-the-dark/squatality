@@ -19,20 +19,20 @@ import java.util.concurrent.TimeUnit
  */
 class RoomVerticle: AbstractVerticle() {
     private val logger = LoggerFactory.getLogger(RoomVerticle::class.java)!!
-    lateinit var id: UUID
+    lateinit var roomID: UUID
     private lateinit var executor: IExecutor
     private lateinit var service: RoomService
 
     override fun start() {
-        id = UUID.fromString(config().getString("uuid"))!!
-        logger.info("Room-$id started")
+        roomID = UUID.fromString(config().getString("uuid"))!!
+        logger.info("Room-$roomID started")
         executor = VertxExecutor(vertx)
         service = RoomService(executor)
 
-        vertx.eventBus().localConsumer<MoveMessage>(Addressing.onMove(id), {moveHandler(it)})
-        vertx.eventBus().localConsumer<HelloMessage>(Addressing.onHello(id), {helloHandler(it)})
-        vertx.eventBus().localConsumer<ThrowBrickMessage>(Addressing.onThrowBrick(id), {throwBrickHandler(it)})
-        vertx.eventBus().localConsumer<String>(Addressing.onDisconnect(id), {disconnectHandler(it)})
+        vertx.eventBus().localConsumer<MoveMessage>(Addressing.onMove(roomID), {moveHandler(it)})
+        vertx.eventBus().localConsumer<HelloMessage>(Addressing.onHello(roomID), {helloHandler(it)})
+        vertx.eventBus().localConsumer<ThrowBrickMessage>(Addressing.onThrowBrick(roomID), {throwBrickHandler(it)})
+        vertx.eventBus().localConsumer<String>(Addressing.onDisconnect(roomID), {disconnectHandler(it)})
         vertx.eventBus().localConsumer<Long>(Addressing.onTick(), {tickHandler(it)})
 
         executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
@@ -41,15 +41,15 @@ class RoomVerticle: AbstractVerticle() {
     }
 
     override fun stop() {
-        logger.info("Room-$id stopped")
+        logger.info("Room-$roomID stopped")
     }
 
     private fun helloHandler(msg: Message<HelloMessage>) {
         val clientID = clientFromHeaders(msg) ?: return
         val body = msg.body() ?: return
         val id = service.onNewClient(body, clientID) ?: return
-        val enemies = service.playersExcept(id)
-        sendToClient(Addressing.onGameStarted(), GameStartedMessage(id, enemies), clientID)
+        val gsm = service.buildGameStateModel()
+        sendToClient(Addressing.onGameStarted(), GameStartedMessage(id, gsm), clientID)
         service.playersExcept(id).forEach {
             sendToClient(Addressing.onEnemyConnected(), EnemyConnectedMessage(id), it)
         }
@@ -77,7 +77,7 @@ class RoomVerticle: AbstractVerticle() {
     }
 
     private fun disconnectHandler(msg: Message<String>) {
-        logger.info("Room-$id onDisconnect: ${msg.body()}")
+        logger.info("Room-$roomID onDisconnect: ${msg.body()}")
         val uuid: String? = msg.body()
         if (uuid != null) {
             val clientID = UUID.fromString(uuid)

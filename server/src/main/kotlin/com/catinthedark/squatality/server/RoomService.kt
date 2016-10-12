@@ -97,17 +97,21 @@ class RoomService(
         return null
     }
 
+    fun buildGameStateModel(): GameStateModel {
+        return GameStateModel(
+            players = players.values.map { it.model.copy() },
+            bricks = bricks.map { it.model.copy() },
+            bonuses = bonuses,
+            time = time / 1000
+        )
+    }
+
     fun onTick(delta: Long): List<Pair<UUID, GameStateModel>> {
         if (players.isEmpty()) return emptyList()
         time += delta
         processGameState()
         val models =  players.map { me ->
-            Pair(me.key, GameStateModel(
-                players = players.values.map { it.model.copy() },
-                bricks = bricks.map { it.model.copy() },
-                bonuses = bonuses,
-                time = time / 1000
-            ))
+            Pair(me.key, buildGameStateModel())
         }
 
         players.forEach {
