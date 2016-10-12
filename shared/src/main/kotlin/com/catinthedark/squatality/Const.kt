@@ -42,12 +42,6 @@ object Const {
             }
         }
 
-        val spawnBrickPoints = (2..9).flatMap { x ->
-            (1..6).map { y ->
-                Vector2(UI.verticalBorderWidth + x * 100f, UI.horizontalBorderWidth + y * 100f)
-            }
-        }
-
         fun randomSpawn(): Vector2 {
             val ab = spawnPoints[Random().nextInt(spawnPoints.size)]
             return ab.copy()
@@ -56,10 +50,5 @@ object Const {
         val bonusDelay = 20L
         val bonusesAtOnce = 2
         fun randomBonus() = Bonus.hat
-
-        fun randomBrickSpawn(): Vector2 {
-            val ab = spawnBrickPoints[Random().nextInt(spawnBrickPoints.size)]
-            return ab.copy()
-        }
     }
 }

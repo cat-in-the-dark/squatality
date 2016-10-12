@@ -140,7 +140,7 @@ class RoomService(
     }
 
     private fun spawnBrick(): Brick {
-        val pos = Const.Balance.randomBrickSpawn()
+        val pos = Const.Balance.randomSpawn()
         return Brick(
             model = BrickModel(
                 id = UUID.randomUUID(),
