@@ -5,14 +5,18 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.catinthedark.lib.ashley.createComponent
 import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.components.network.BonusesComponent
 import com.catinthedark.squatality.game.components.network.BricksComponent
 import com.catinthedark.squatality.game.components.network.PlayersComponent
 import com.catinthedark.squatality.models.BonusModel
+import com.catinthedark.squatality.models.BrickModel
 import com.catinthedark.squatality.models.State
 import java.util.*
 
@@ -44,6 +48,7 @@ class World(
             tc.centered = true
             trc.pos.x = x
             trc.pos.y = y
+            trc.pos.z = 1f
 
             add(ac)
             add(tc)
@@ -137,6 +142,29 @@ class World(
             add(brc)
             add(bc)
             add(pc)
+        }
+    }
+
+    fun createBrick(brick: BrickModel): Entity {
+        return engine.createEntity().apply {
+            val trc: TransformComponent = engine.createComponent()
+            val tc: TextureComponent = engine.createComponent()
+            val ric: RemoteIDComponent = engine.createComponent()
+            val hc: HurtComponent = engine.createComponent()
+
+            tc.region = TextureRegion(am.get(Assets.Names.BRICK, Texture::class.java))
+            tc.centered = true
+            ric.id = brick.id
+            trc.pos.x = brick.x
+            trc.pos.y = brick.y
+            trc.angle = brick.angle.toFloat()
+            hc.hurting = brick.hurting
+
+            add(tc)
+            add(trc)
+            add(ric)
+            add(hc)
+            println("NEW BRICK $brick")
         }
     }
 }

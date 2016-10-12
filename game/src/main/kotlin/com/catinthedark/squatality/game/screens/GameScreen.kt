@@ -13,6 +13,7 @@ import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
+import com.catinthedark.squatality.game.systems.network.BricksSystem
 import com.catinthedark.squatality.game.systems.network.PlayersSystem
 import com.catinthedark.squatality.game.systems.network.RemoteSyncSystem
 import com.catinthedark.squatality.models.HelloMessage
@@ -41,6 +42,7 @@ class GameScreen(
         engine.addSystem(ls)
         engine.addSystem(RemoteMovementSystem(nc.sender))
         engine.addSystem(PlayersSystem())
+        engine.addSystem(BricksSystem(world))
         engine.addSystem(KnobMovementSystem())
         engine.addSystem(KnobAimSystem())
         engine.addSystem(FollowCameraSystem(stage.camera))

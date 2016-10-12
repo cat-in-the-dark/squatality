@@ -42,11 +42,11 @@ object Const {
             }
         }
 
-        val spawnBrickPoints = listOf(
-            Vector2(200f, 200f),
-            Vector2(400f, 100f),
-            Vector2(120f, 500f)
-        )
+        val spawnBrickPoints = (2..9).flatMap { x ->
+            (1..6).map { y ->
+                Vector2(UI.verticalBorderWidth + x * 100f, UI.horizontalBorderWidth + y * 100f)
+            }
+        }
 
         fun randomSpawn(): Vector2 {
             val ab = spawnPoints[Random().nextInt(spawnPoints.size)]
