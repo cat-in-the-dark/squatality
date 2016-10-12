@@ -50,5 +50,18 @@ class BricksSystem(
                 }
             }
         }
+        entities.forEach { processEntity(it, model, deltaTime) }
+    }
+
+    private fun processEntity(entity: Entity, model: Pair<List<BrickModel>, Long>, deltaTime1: Float) {
+        val (bm, delay) = model
+        val trc = Mappers.transform[entity] ?: return
+        val hc = Mappers.hurt[entity] ?: return
+        val rc = Mappers.remote.id[entity] ?: return
+        val target = bm.find { it.id == rc.id } ?: return
+        hc.hurting = target.hurting
+        trc.pos.x = target.x
+        trc.pos.y = target.y
+        trc.angle = target.angle.toFloat()
     }
 }

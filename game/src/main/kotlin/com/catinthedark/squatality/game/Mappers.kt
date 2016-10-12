@@ -17,10 +17,12 @@ object Mappers {
     val knob = ComponentMapper.getFor(KnobComponent::class.java)!!
     val aim = ComponentMapper.getFor(AimComponent::class.java)!!
     val hurt = ComponentMapper.getFor(HurtComponent::class.java)!!
+
     object remote {
         val transform = ComponentMapper.getFor(RemoteMoveComponent::class.java)!!
         val id = ComponentMapper.getFor(RemoteIDComponent::class.java)!!
     }
+
     object network {
         val bonuses = ComponentMapper.getFor(BonusesComponent::class.java)!!
         val bricks = ComponentMapper.getFor(BricksComponent::class.java)!!
