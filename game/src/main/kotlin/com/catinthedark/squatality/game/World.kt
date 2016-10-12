@@ -41,8 +41,8 @@ class World(
             ac.animations[State.RUNNING.name] = skin.running
             ac.animations[State.KILLED.name] = skin.killed
             ac.animations[State.THROWING.name] = skin.throwing
-            ac.animations["RUNNING_WITH_BRICK"] = skin.runningWithBrick
-            ac.animations["IDLE_WITH_BRICK"] = skin.idleWithBrick
+            ac.animations["${State.RUNNING.name}_WITH_BRICK"] = skin.runningWithBrick
+            ac.animations["${State.IDLE.name}_WITH_BRICK"] = skin.idleWithBrick
             sc.state = State.IDLE.name
 
             tc.centered = true
@@ -164,7 +164,27 @@ class World(
             add(trc)
             add(ric)
             add(hc)
-            println("NEW BRICK $brick")
+        }
+    }
+
+    fun createBonus(bonus: BonusModel): Entity {
+        return engine.createEntity().apply {
+            val trc: TransformComponent = engine.createComponent()
+            val tc: TextureComponent = engine.createComponent()
+            val ric: RemoteIDComponent = engine.createComponent()
+            val bc: BonusComponent = engine.createComponent()
+
+            tc.region = TextureRegion(am.get(Assets.Names.BONUS, Texture::class.java))
+            tc.centered = true
+            ric.id = bonus.id
+            trc.pos.x = bonus.x
+            trc.pos.y = bonus.y
+            bc.typeName = bonus.typeName
+
+            add(tc)
+            add(trc)
+            add(ric)
+            add(bc)
         }
     }
 }

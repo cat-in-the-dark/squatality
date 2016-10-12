@@ -29,6 +29,7 @@ object Assets {
         val KNOB_BACKGROUND = "textures/touchBackground.png"
         val KNOB = "textures/touchKnob.png"
         val BRICK = "textures/brick.png"
+        val BONUS = "textures/kepa.png"
         object Player {
             val RED = "textures/gop_red.png"
             val BLACK = "textures/gop_black.png"
