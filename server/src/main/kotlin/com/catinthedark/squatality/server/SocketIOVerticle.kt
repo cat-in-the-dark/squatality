@@ -132,6 +132,10 @@ class SocketIOVerticle : AbstractVerticle() {
             val clientID = clientFromHeaders(it)
             push(server.getClient(clientID), it.body())
         })
+        vertx.eventBus().localConsumer<EnemyDisconnectedMessage>(Addressing.onEnemyDisconnected(), {
+            val clientID = clientFromHeaders(it)
+            push(server.getClient(clientID), it.body())
+        })
     }
 
     private fun <T : IMessage> clientFromHeaders(msg: Message<T>): UUID? {

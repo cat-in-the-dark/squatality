@@ -1,16 +1,15 @@
 package com.catinthedark.squatality.game.screens
 
+import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
-import com.catinthedark.squatality.game.Assets
-import com.catinthedark.squatality.game.Const
-import com.catinthedark.squatality.game.NetworkControl
-import com.catinthedark.squatality.game.World
+import com.catinthedark.squatality.game.*
 import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
+import com.catinthedark.squatality.game.components.RemoteIDComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
@@ -69,6 +68,13 @@ class GameScreen(
         nc.onEnemyConnected.subscribe {
             val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
             engine.addEntity(enemy)
+        }
+
+        nc.onEnemyDisconnected.subscribe { msg ->
+            val enemy = engine.getEntitiesFor(Family.all(RemoteIDComponent::class.java).get()).find { e ->
+                Mappers.remote.id[e].id == msg.clientId
+            }
+            engine.removeEntity(enemy)
         }
 
         Gdx.input.inputProcessor = hudStage

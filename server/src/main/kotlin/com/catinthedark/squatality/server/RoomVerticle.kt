@@ -82,6 +82,9 @@ class RoomVerticle: AbstractVerticle() {
         if (uuid != null) {
             val clientID = UUID.fromString(uuid)
             service.onDisconnect(clientID)
+            service.playersExcept(clientID).forEach {
+                sendToClient(Addressing.onEnemyDisconnected(), EnemyDisconnectedMessage(clientID), it)
+            }
         }
         if (service.shouldStop()) {
             vertx.undeploy(deploymentID())
