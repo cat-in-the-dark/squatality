@@ -33,7 +33,6 @@ class PairingScreen(
 
     override fun run(delta: Float): AssetManager? {
         if (hello != null) {
-            nc.sender(HelloMessage(Const.Names.random()))
             return am
         }
         stage.batch.managed {

@@ -2,6 +2,9 @@ package com.catinthedark.squatality.game
 
 import com.badlogic.ashley.core.ComponentMapper
 import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.components.network.BonusesComponent
+import com.catinthedark.squatality.game.components.network.BricksComponent
+import com.catinthedark.squatality.game.components.network.PlayersComponent
 
 object Mappers {
     val lerpTransform = ComponentMapper.getFor(LerpTransformComponent::class.java)!!
@@ -16,5 +19,10 @@ object Mappers {
     object remote {
         val transform = ComponentMapper.getFor(RemoteMoveComponent::class.java)!!
         val id = ComponentMapper.getFor(RemoteIDComponent::class.java)!!
+    }
+    object network {
+        val bonuses = ComponentMapper.getFor(BonusesComponent::class.java)!!
+        val bricks = ComponentMapper.getFor(BricksComponent::class.java)!!
+        val players = ComponentMapper.getFor(PlayersComponent::class.java)!!
     }
 }

@@ -6,12 +6,16 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.squatality.game.Assets
+import com.catinthedark.squatality.game.Const
 import com.catinthedark.squatality.game.NetworkControl
 import com.catinthedark.squatality.game.World
 import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
+import com.catinthedark.squatality.game.systems.network.PlayersSystem
+import com.catinthedark.squatality.game.systems.network.RemoteSyncSystem
+import com.catinthedark.squatality.models.HelloMessage
 
 class GameScreen(
     private val stage: Stage,
@@ -20,24 +24,27 @@ class GameScreen(
 ) : YieldUnit<AssetManager, Any> {
     private val engine = PooledEngine()
     private lateinit var world: World
+    private val TAG = "GameScreen"
 
     override fun onActivate(data: AssetManager) {
-        Gdx.app.log("GameScreen", "GameScreen started")
+        Gdx.app.log(TAG, "GameScreen started")
         world = World(engine, data)
+        engine.addEntity(world.createSync())
+
         engine.addSystem(RenderingSystem(stage, hudStage))
         engine.addSystem(AnimationSystem())
         engine.addSystem(StateSystem())
         //engine.addSystem(LocalMovementSystem())
+        val rss = RemoteSyncSystem(nc.onGameState)
+        engine.addSystem(rss)
         val ls = LerpSystem()
         engine.addSystem(ls)
         engine.addSystem(RemoteMovementSystem(nc.sender))
-        val rcs = RemoteControlSystem(nc.onGameState)
-        engine.addSystem(rcs)
-        //engine.addSystem(RandomControlSystem())
+        engine.addSystem(PlayersSystem())
         engine.addSystem(KnobMovementSystem())
         engine.addSystem(KnobAimSystem())
         engine.addSystem(FollowCameraSystem(stage.camera))
-        engine.addSystem(PerformanceSystem(hudStage, rcs.getSyncDelta, ls.getLerpDelay))
+        engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay))
 
         engine.addEntity(world.createField())
 
@@ -59,6 +66,8 @@ class GameScreen(
         }
 
         Gdx.input.inputProcessor = hudStage
+
+        nc.sender(HelloMessage(Const.Names.random()))
     }
 
     override fun run(delta: Float): Any? {

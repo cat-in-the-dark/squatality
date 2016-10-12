@@ -1,24 +1,22 @@
-package com.catinthedark.squatality.game.systems
+package com.catinthedark.squatality.game.systems.network
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.math.Vector3
 import com.catinthedark.lib.Observable
 import com.catinthedark.squatality.game.Mappers
-import com.catinthedark.squatality.game.components.LerpTransformComponent
-import com.catinthedark.squatality.game.components.LerpTransformElement
-import com.catinthedark.squatality.game.components.RemoteIDComponent
-import com.catinthedark.squatality.game.components.StateComponent
+import com.catinthedark.squatality.game.components.network.BonusesComponent
+import com.catinthedark.squatality.game.components.network.BricksComponent
+import com.catinthedark.squatality.game.components.network.PlayersComponent
 import com.catinthedark.squatality.game.utils.TimeConverter
 import com.catinthedark.squatality.models.GameStateModel
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class RemoteControlSystem(
+class RemoteSyncSystem(
     private val onGameState: Observable<GameStateModel>
 ) : IteratingSystem(
-    Family.all(LerpTransformComponent::class.java, StateComponent::class.java, RemoteIDComponent::class.java).get()
+    Family.all(BonusesComponent::class.java, BricksComponent::class.java, PlayersComponent::class.java).get()
 ) {
     private val gameStates = ConcurrentLinkedQueue<Pair<GameStateModel, Long>>()
     private var syncDelta = 0L
@@ -48,25 +46,18 @@ class RemoteControlSystem(
         while (gameStates.isNotEmpty()) {
             val (gs, delay) = gameStates.poll() ?: break
             entities.forEach { entity ->
-                val sc = Mappers.state[entity] ?: return@forEach
-                val rc = Mappers.remote.id[entity] ?: return@forEach
-                val ltc = Mappers.lerpTransform[entity] ?: return@forEach
-                val target = gs.players.find { it.id == rc.id } ?: return@forEach
-                if (target.updated) {
-                    ltc.queue.add(LerpTransformElement(
-                        prevPos = Vector3(target.previousX, target.previousY, 0f),
-                        pos = Vector3(target.x, target.y, 0f),
-                        angle = target.angle
-                    ), ltc.syncDelta)
-                    ltc.syncDelta = 0L
-                }
-                ltc.syncDelta += delay
-                sc.state = target.state.name
+                val pc = Mappers.network.players[entity]
+                val bc = Mappers.network.bonuses[entity]
+                val brc = Mappers.network.bricks[entity]
+                pc.queue.add(Pair(gs.players, delay))
+                bc.queue.add(Pair(gs.bonuses, delay))
+                brc.queue.add(Pair(gs.bricks, delay))
             }
         }
     }
 
+
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        // nothing to do
+        // nothing to do here
     }
 }

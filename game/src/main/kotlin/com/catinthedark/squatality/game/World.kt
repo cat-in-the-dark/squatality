@@ -9,6 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.components.network.BonusesComponent
+import com.catinthedark.squatality.game.components.network.BricksComponent
+import com.catinthedark.squatality.game.components.network.PlayersComponent
+import com.catinthedark.squatality.models.BonusModel
 import com.catinthedark.squatality.models.State
 import java.util.*
 
@@ -122,6 +126,17 @@ class World(
             cam.rightUpperCorner.y = 1122f
             add(cam)
             add(target)
+        }
+    }
+
+    fun createSync(): Entity {
+        return engine.createEntity().apply {
+            val brc = engine.createComponent(BricksComponent::class.java)
+            val bc = engine.createComponent(BonusesComponent::class.java)
+            val pc = engine.createComponent(PlayersComponent::class.java)
+            add(brc)
+            add(bc)
+            add(pc)
         }
     }
 }
