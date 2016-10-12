@@ -29,12 +29,12 @@ class World(
      */
     fun createUnit(id: UUID, x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
         return with(engine.createEntity(), {
-            val ac = engine.createComponent(AnimationComponent::class.java)
-            val tc = engine.createComponent(TextureComponent::class.java)
-            val sc = engine.createComponent(StateComponent::class.java)
-            val trc = engine.createComponent(TransformComponent::class.java)
-            val ric = engine.createComponent(RemoteIDComponent::class.java)
-            val ltc = engine.createComponent(LerpTransformComponent::class.java)
+            val ac: AnimationComponent = engine.createComponent()
+            val tc: TextureComponent = engine.createComponent()
+            val sc: StateComponent = engine.createComponent()
+            val trc: TransformComponent = engine.createComponent()
+            val ric: RemoteIDComponent = engine.createComponent()
+            val ltc: LerpTransformComponent = engine.createComponent()
 
             ric.id = id
             ac.animations[State.IDLE.name] = skin.idle
@@ -64,9 +64,9 @@ class World(
      */
     fun createPlayer(id: UUID, x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
         return with(createUnit(id, x, y, skin), {
-            val mc = engine.createComponent(MoveComponent::class.java)
-            val aimC = engine.createComponent(AimComponent::class.java)
-            val rmc = engine.createComponent(RemoteMoveComponent::class.java)
+            val mc: MoveComponent = engine.createComponent()
+            val aimC: AimComponent = engine.createComponent()
+            val rmc: RemoteMoveComponent = engine.createComponent()
 
             mc.acceleration.x = 250f
             mc.acceleration.y = 250f
@@ -79,8 +79,8 @@ class World(
 
     fun createField(): Entity {
         return engine.createEntity().apply {
-            val tc = engine.createComponent(TextureComponent::class.java)
-            val trc = engine.createComponent(TransformComponent::class.java)
+            val tc: TextureComponent = engine.createComponent()
+            val trc: TransformComponent = engine.createComponent()
             tc.region = TextureRegion(am.get(Assets.Names.FIELD, Texture::class.java))
             trc.pos.z = -1f
             add(tc)
@@ -90,7 +90,7 @@ class World(
 
     fun createMovementKnob(x: Float, y: Float, mc: MoveComponent, hudStage: Stage): Entity {
         return engine.createEntity().apply {
-            val kc = engine.createComponent(KnobComponent::class.java)
+            val kc: KnobComponent = engine.createComponent()
             kc.touchPad = Touchpad(10f,
                 Touchpad.TouchpadStyle().apply {
                     background = TextureRegionDrawable(TextureRegion(am.get(Assets.Names.KNOB_BACKGROUND, Texture::class.java)))
@@ -108,7 +108,7 @@ class World(
 
     fun createAimKnob(x: Float, y: Float, ac: AimComponent, hudStage: Stage): Entity {
         return engine.createEntity().apply {
-            val kc = engine.createComponent(KnobComponent::class.java)
+            val kc: KnobComponent = engine.createComponent()
             kc.touchPad = Touchpad(10f,
                 Touchpad.TouchpadStyle().apply {
                     background = TextureRegionDrawable(TextureRegion(am.get(Assets.Names.KNOB_BACKGROUND, Texture::class.java)))
@@ -126,7 +126,7 @@ class World(
 
     fun createCamera(target: TransformComponent): Entity {
         return engine.createEntity().apply {
-            val cam = engine.createComponent(CameraComponent::class.java)
+            val cam: CameraComponent = engine.createComponent()
             cam.rightUpperCorner.x = 1551f
             cam.rightUpperCorner.y = 1122f
             add(cam)
@@ -136,9 +136,9 @@ class World(
 
     fun createSync(): Entity {
         return engine.createEntity().apply {
-            val brc = engine.createComponent(BricksComponent::class.java)
-            val bc = engine.createComponent(BonusesComponent::class.java)
-            val pc = engine.createComponent(PlayersComponent::class.java)
+            val brc: BricksComponent = engine.createComponent()
+            val bc: BonusesComponent = engine.createComponent()
+            val pc: PlayersComponent = engine.createComponent()
             add(brc)
             add(bc)
             add(pc)
