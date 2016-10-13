@@ -16,7 +16,7 @@ class AnimationSystem: IteratingSystem(
         val anim = Mappers.animation[entity] ?: return
         val state = Mappers.state[entity] ?: return
 
-        val animation = anim.animations[state.state] ?: return
+        val animation = anim.animations[state.animState()] ?: return
         tex.region = animation.getKeyFrame(state.time)
     }
 }

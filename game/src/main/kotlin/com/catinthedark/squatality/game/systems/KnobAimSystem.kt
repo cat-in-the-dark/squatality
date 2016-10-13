@@ -31,6 +31,7 @@ class KnobAimSystem(
         if (tp.knobPercentX != 0f || tp.knobPercentY != 0f) {
             ac.angle = point.angle() - 90
             ac.aiming = true
+            println(sc.state)
             if (sc.hasBrick && sc.state == State.IDLE.name) {
                 if (ac.force < Const.Balance.minShootRange) {
                     ac.force = Const.Balance.minShootRange

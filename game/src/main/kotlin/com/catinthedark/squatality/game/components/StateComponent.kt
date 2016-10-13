@@ -13,4 +13,12 @@ data class StateComponent(
         state = null
         hasBrick = false
     }
+
+    fun animState(): String? {
+        return if (hasBrick) {
+            "${state}_WITH_BRICK"
+        } else {
+            state
+        }
+    }
 }

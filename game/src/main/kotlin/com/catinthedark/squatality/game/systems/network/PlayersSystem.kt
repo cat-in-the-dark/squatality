@@ -45,11 +45,7 @@ class PlayersSystem : NetworkSystem<PlayerModel>() {
             ltc.syncDelta = 0L
         }
         ltc.syncDelta += delay
-        if (target.hasBrick) {
-            sc.state = "${target.state.name}_WITH_BRICK"
-        } else {
-            sc.state = target.state.name
-        }
+        sc.state = target.state.name
         sc.hasBrick = target.hasBrick
     }
 }
