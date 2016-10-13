@@ -50,5 +50,6 @@ class PlayersSystem : NetworkSystem<PlayerModel>() {
         } else {
             sc.state = target.state.name
         }
+        sc.hasBrick = target.hasBrick
     }
 }

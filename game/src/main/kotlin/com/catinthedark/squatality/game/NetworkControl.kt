@@ -43,7 +43,7 @@ class NetworkControl(serverAddress: URI): Runnable {
             Gdx.app.log(TAG, "Disconnected")
         })
         subscribe(GameStartedMessage::class.java, {
-            Gdx.app.log(TAG, "GameStartedMessage $it")
+            Gdx.app.log(TAG, "$it")
             onGameStarted(it)
         })
         subscribe(ServerHelloMessage::class.java, {

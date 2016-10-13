@@ -106,7 +106,7 @@ class World(
         }
     }
 
-    fun createAimKnob(x: Float, y: Float, ac: AimComponent, hudStage: Stage): Entity {
+    fun createAimKnob(x: Float, y: Float, ac: AimComponent, sc: StateComponent, tc: TransformComponent, hudStage: Stage): Entity {
         return engine.createEntity().apply {
             val kc: KnobComponent = engine.createComponent()
             kc.touchPad = Touchpad(10f,
@@ -121,6 +121,8 @@ class World(
 
             add(kc)
             add(ac)
+            add(sc)
+            add(tc)
         }
     }
 

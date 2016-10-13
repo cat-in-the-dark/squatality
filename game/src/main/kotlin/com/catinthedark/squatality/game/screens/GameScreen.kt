@@ -6,11 +6,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
+import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
-import com.catinthedark.squatality.game.components.AimComponent
-import com.catinthedark.squatality.game.components.MoveComponent
-import com.catinthedark.squatality.game.components.RemoteIDComponent
-import com.catinthedark.squatality.game.components.TransformComponent
+import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
@@ -45,7 +43,7 @@ class GameScreen(
         engine.addSystem(BricksSystem(world))
         engine.addSystem(BonusesSystem(world))
         engine.addSystem(KnobMovementSystem())
-        engine.addSystem(KnobAimSystem())
+        engine.addSystem(KnobAimSystem(nc.sender))
         engine.addSystem(FollowCameraSystem(stage.camera))
         engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay))
 
@@ -56,9 +54,9 @@ class GameScreen(
             val me = gsm.gameStateModel.players.first { it.id == gsm.clientId }
             val mainPlayerComponent = world.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(data.get(Assets.Names.Player.BLUE)))
             engine.addEntity(mainPlayerComponent)
-            engine.addEntity(world.createMovementKnob(30f, 20f, mainPlayerComponent.getComponent(MoveComponent::class.java), hudStage))
-            engine.addEntity(world.createAimKnob(1000f, 20f, mainPlayerComponent.getComponent(AimComponent::class.java), hudStage))
-            engine.addEntity(world.createCamera(mainPlayerComponent.getComponent(TransformComponent::class.java)))
+            engine.addEntity(world.createMovementKnob(30f, 20f, mainPlayerComponent.getComponent(), hudStage))
+            engine.addEntity(world.createAimKnob(1000f, 20f, mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), hudStage))
+            engine.addEntity(world.createCamera(mainPlayerComponent.getComponent()))
             enemies.forEach { em ->
                 val enemy = world.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
                 engine.addEntity(enemy)
