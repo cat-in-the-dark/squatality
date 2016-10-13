@@ -31,23 +31,26 @@ class SocketIOVerticle : AbstractVerticle() {
         server = SocketIOServer(config)
     }
 
-    private fun findOrCreateRoom(): UUID {
+    private fun findOrCreateRoom(callback: (UUID) -> Unit) {
         val rooms = clientsInRoom.values.toSet()
         if (rooms.size < 1) {
             val roomID = UUID.randomUUID()
             val roomConfig = JsonObject().put("uuid", roomID.toString())
             val roomOptions = DeploymentOptions().setConfig(roomConfig)
-            vertx.deployVerticle(RoomVerticle(), roomOptions)
-            return roomID
+            vertx.deployVerticle(RoomVerticle(), roomOptions, {
+                callback(roomID)
+            })
         } else {
-            return rooms.first()
+            callback(rooms.first())
         }
     }
 
     private val connectHandler = ConnectListener { client ->
-        clientsInRoom[client.sessionId] = findOrCreateRoom()
-        push(client, ServerHelloMessage(client.sessionId))
-        logger.info("Connected client ${client.sessionId}")
+        findOrCreateRoom { id ->
+            clientsInRoom[client.sessionId] = id
+            push(client, ServerHelloMessage(client.sessionId))
+            logger.info("Connected client ${client.sessionId}")
+        }
     }
 
     private val disconnectHandler = DisconnectListener { client ->
