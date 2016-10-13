@@ -16,7 +16,7 @@ object Const {
 
     object Network {
         val server: URI = URI.create("https://squatality-test.herokuapp.com/")
-        //val server: URI = URI.create("http://localhost:8080/")
+        val localServer: URI = URI.create("http://localhost:8080/")
         val tickRate = 40f
         val syncDelay: Float = 1f / tickRate // in seconds
         /**

@@ -77,6 +77,31 @@ class World(
         })
     }
 
+    fun createFan(x: Float, y: Float, angle: Float, skin: Assets.FanSkin): Entity {
+        return engine.createEntity().apply {
+            val ac: AnimationComponent = engine.createComponent()
+            val trc: TransformComponent = engine.createComponent()
+            val tc: TextureComponent = engine.createComponent()
+            val sc: StateComponent = engine.createComponent()
+            sc.state = "HANDS_UP"
+            ac.animations["HANDS_UP"] = skin.handsUp
+            ac.animations["IDLE"] = skin.idle
+            trc.pos.x = x
+            trc.pos.y = y
+            trc.angle = angle
+            add(ac)
+            add(trc)
+            add(tc)
+            add(sc)
+        }
+    }
+
+    fun createFans(): List<Entity> {
+        return listOf(
+            createFan(20f,20f,0f, Assets.GirlFanSkin(am[Assets.Names.FANS]))
+        )
+    }
+
     fun createField(): Entity {
         return engine.createEntity().apply {
             val tc: TextureComponent = engine.createComponent()

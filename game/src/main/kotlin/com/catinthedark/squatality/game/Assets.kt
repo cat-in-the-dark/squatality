@@ -3,6 +3,7 @@ package com.catinthedark.squatality.game
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.catinthedark.lib.AnimationUtils
@@ -30,11 +31,51 @@ object Assets {
         val KNOB = "textures/touchKnob.png"
         val BRICK = "textures/brick.png"
         val BONUS = "textures/kepa.png"
+        val FANS = "textures/fans.png"
         object Player {
             val RED = "textures/gop_red.png"
             val BLACK = "textures/gop_black.png"
             val BLUE = "textures/gop_blue.png"
         }
+    }
+
+    abstract class FanSkin(texture: Texture) {
+        protected val frames: Array<Array<TextureRegion>> = TextureRegion.split(texture, 100, 100)
+        protected abstract val handsUpIndexes: Array<Pair<Int, Int>>
+        protected abstract val idleIndexes: Array<Pair<Int, Int>>
+        val handsUp: Animation
+            get() = AnimationUtils.loopingAnimation(Const.UI.animationSpeed, frames, *handsUpIndexes)
+        val idle: Animation
+            get() = AnimationUtils.loopingAnimation(Const.UI.animationSpeed, frames, *idleIndexes)
+
+    }
+
+    class BlueFanSkin(texture: Texture) : FanSkin(texture) {
+        override val handsUpIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(0,0), Pair(0,1))
+        override val idleIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(0,0))
+    }
+
+    class RedFanSkin(texture: Texture) : FanSkin(texture) {
+        override val handsUpIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(1,0), Pair(1,1))
+        override val idleIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(1,0))
+    }
+
+    class BlackFanSkin(texture: Texture) : FanSkin(texture) {
+        override val handsUpIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(2,0), Pair(2,1))
+        override val idleIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(2,0))
+    }
+
+    class GirlFanSkin(texture: Texture) : FanSkin(texture) {
+        override val handsUpIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(3,0), Pair(3,1))
+        override val idleIndexes: Array<Pair<Int, Int>>
+            get() = arrayOf(Pair(3,0))
     }
 
     data class PlayerSkin(private val texture: Texture) {

@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
-import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.components.RemoteIDComponent
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
@@ -48,6 +48,7 @@ class GameScreen(
         engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay))
 
         engine.addEntity(world.createField())
+        world.createFans().forEach { engine.addEntity(it) }
 
         nc.onGameStarted.subscribe { gsm ->
             val enemies = gsm.gameStateModel.players.filter { it.id != gsm.clientId }
