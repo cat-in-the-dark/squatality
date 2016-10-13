@@ -71,9 +71,9 @@ class SocketIOVerticle : AbstractVerticle() {
                 options.addHeader(headerClientID, client.sessionId.toString())
                 with(vertx.eventBus(), {
                     when (msg) {
-                        is HelloMessage -> send(Addressing.onHello(roomID), msg, options)
-                        is MoveMessage -> send(Addressing.onMove(roomID), msg, options)
-                        is ThrowBrickMessage -> send(Addressing.onThrowBrick(roomID), msg, options)
+                        is HelloMessage -> publish(Addressing.onHello(roomID), msg, options)
+                        is MoveMessage -> publish(Addressing.onMove(roomID), msg, options)
+                        is ThrowBrickMessage -> publish(Addressing.onThrowBrick(roomID), msg, options)
                         else -> logger.warn("Undefined message $msg")
                     }
                 })

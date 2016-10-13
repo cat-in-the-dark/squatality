@@ -99,6 +99,6 @@ class RoomVerticle: AbstractVerticle() {
     private fun <T: IMessage> sendToClient(address: String, msg: T, clientID: UUID) {
         val options = DeliveryOptions()
         options.addHeader(headerClientID, clientID.toString())
-        vertx.eventBus().send(address, msg, options)
+        vertx.eventBus().publish(address, msg, options)
     }
 }
