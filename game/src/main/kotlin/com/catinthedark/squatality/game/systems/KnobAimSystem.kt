@@ -6,11 +6,13 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.catinthedark.lib.IMessage
+import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.KnobComponent
 import com.catinthedark.squatality.game.components.StateComponent
 import com.catinthedark.squatality.game.components.TransformComponent
+import com.catinthedark.squatality.models.State
 import com.catinthedark.squatality.models.ThrowBrickMessage
 
 class KnobAimSystem(
@@ -29,8 +31,12 @@ class KnobAimSystem(
         if (tp.knobPercentX != 0f || tp.knobPercentY != 0f) {
             ac.angle = point.angle() - 90
             ac.aiming = true
-            if (sc.hasBrick) {
-                ac.force = 40f
+            if (sc.hasBrick && sc.state == State.IDLE.name) {
+                if (ac.force < Const.Balance.minShootRange) {
+                    ac.force = Const.Balance.minShootRange
+                } else if (ac.force < Const.Balance.maxShootRage){
+                    ac.force += Const.Balance.shootRageSpeed
+                }
             }
         } else {
             ac.aiming = false
@@ -43,6 +49,10 @@ class KnobAimSystem(
     }
 
     private fun throwBrick(pos: Vector3, angle: Float, force: Float) {
-        send(ThrowBrickMessage(pos.x, pos.y, force, angle.toDouble()))
+        val d = Const.Balance.playerRadius + Const.Balance.brickRadius + 5
+        val a = Math.toRadians(angle.toDouble())
+        val brickX = pos.x - d * Math.sin(a).toFloat()
+        val brickY = pos.y + d * Math.cos(a).toFloat()
+        send(ThrowBrickMessage(brickX, brickY, force, angle.toDouble()))
     }
 }

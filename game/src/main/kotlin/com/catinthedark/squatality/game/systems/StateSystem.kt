@@ -13,7 +13,7 @@ class StateSystem : IteratingSystem(
         val state = Mappers.state[entity] ?: return
 
         if (state.state == "RUNNING" || state.state == "RUNNING_WITH_BRICK") {
-            state.time += deltaTime * 2
+            state.time += deltaTime
         } else {
             state.time += deltaTime
         }
