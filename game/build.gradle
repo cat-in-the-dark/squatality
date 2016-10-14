@@ -11,7 +11,9 @@ targetCompatibility = 1.8
 dependencies {
     compile project(':shared')
     compile "org.slf4j:slf4j-simple:1.7.7"
-    compile "kryonet:kryonet:2.21"
+    compile ("com.esotericsoftware:kryonet:2.22.0-RC1") {
+        exclude module : 'kryo'
+    }
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.ashley:ashley:1.7.3"
