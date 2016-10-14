@@ -6,11 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
 import com.catinthedark.squatality.game.Assets
-import com.catinthedark.squatality.game.Const
 import com.catinthedark.squatality.game.NetworkControl
-import com.catinthedark.squatality.models.HelloMessage
 import com.catinthedark.squatality.models.ServerHelloMessage
-import io.socket.thread.EventThread
 
 class PairingScreen(
     private val stage: Stage,
@@ -25,7 +22,7 @@ class PairingScreen(
 
     override fun onActivate(data: AssetManager) {
         am = data
-        EventThread.exec(nc)
+        Thread(nc).start()
         nc.onServerHello.subscribe {
             hello = it
         }

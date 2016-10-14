@@ -11,10 +11,6 @@ targetCompatibility = 1.8
 dependencies {
     compile project(':shared')
     compile "org.slf4j:slf4j-simple:1.7.7"
-    compile ('io.socket:socket.io-client:0.8.1') {
-        // excluding org.json which is provided by Android
-        exclude group: 'org.json', module: 'json'
-    }
     compile "kryonet:kryonet:2.21"
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
