@@ -1,29 +1,28 @@
 package com.catinthedark.lib.network
 
-import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.Parser
 import com.catinthedark.lib.RemoteTransport
 import io.socket.client.IO
 import io.socket.client.Socket.*
 import java.net.URI
 
-class SocketIOTransport(parser: Parser, uri: URI) : RemoteTransport(parser) {
+class SocketIOTransport(parser: Parser, connectionOptions: ConnectionOptions) : RemoteTransport(parser), NetworkConnector {
     private val options = IO.Options().apply {
         forceNew = true
         reconnection = true
     }
-    private val socket = IO.socket(uri, options).apply {
+    private val socket = IO.socket(connectionOptions.uri, options).apply {
         on(EVENT_CONNECT, {
-            onReceive(ConnectMessage(this.id()))
+            onReceive(NetworkConnector.ConnectMessage(this.id()))
         })
         on(EVENT_RECONNECT, {
-            onReceive(ReConnectMessage(this.id()))
+            onReceive(NetworkConnector.ReConnectMessage(this.id()))
         })
         on(EVENT_DISCONNECT, {
-            onReceive(DisconnectMessage())
+            onReceive(NetworkConnector.DisconnectMessage())
         })
         on(EVENT_CONNECT_ERROR, {
-            onReceive(ConnectErrorMessage())
+            onReceive(NetworkConnector.ConnectErrorMessage())
         })
         on(EVENT_MESSAGE, {
             val data = it.firstOrNull()
@@ -33,20 +32,15 @@ class SocketIOTransport(parser: Parser, uri: URI) : RemoteTransport(parser) {
         })
     }
 
-    fun connect() {
+    override fun connect() {
         socket.connect()
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         socket.disconnect()
     }
 
-    override fun remoteSend(data: String) {
+    override fun remoteSend(data: String, withAck: Boolean) {
         socket.send(data)
     }
-
-    data class ReConnectMessage(val id: String) : IMessage
-    data class ConnectMessage(val id: String) : IMessage
-    class DisconnectMessage() : IMessage
-    class ConnectErrorMessage() : IMessage
 }

@@ -9,7 +9,7 @@ abstract class RemoteTransport(val parser: Parser): Transport {
         log.warn("Receiver wasn't specified")
     }
 
-    override fun send(msg: IMessage) {
+    override fun send(msg: IMessage, withAck: Boolean) {
         try {
             val data = parser.wrap(msg)
             remoteSend(data)
@@ -35,5 +35,5 @@ abstract class RemoteTransport(val parser: Parser): Transport {
         receiver(msg)
     }
 
-    protected abstract fun remoteSend(data: String)
+    protected abstract fun remoteSend(data: String, withAck: Boolean = true)
 }

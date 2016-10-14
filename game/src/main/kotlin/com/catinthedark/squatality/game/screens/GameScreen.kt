@@ -38,7 +38,7 @@ class GameScreen(
         engine.addSystem(rss)
         val ls = LerpSystem()
         engine.addSystem(ls)
-        engine.addSystem(RemoteMovementSystem(nc.sender))
+        engine.addSystem(RemoteMovementSystem(nc.senderUnreliable))
         engine.addSystem(PlayersSystem())
         engine.addSystem(BricksSystem(world))
         engine.addSystem(BonusesSystem(world))

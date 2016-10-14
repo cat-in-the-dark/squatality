@@ -17,7 +17,7 @@ class LocalTransport : Transport {
         this.receiver = receiver
     }
 
-    override fun send(msg: IMessage) {
+    override fun send(msg: IMessage, withAck: Boolean) {
         receiver(msg)
     }
 }

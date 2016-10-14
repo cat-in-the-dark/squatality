@@ -9,6 +9,7 @@ class MainVerticle: AbstractVerticle() {
 
     override fun start() {
         logger.info("MainVerticle started")
-        vertx.deployVerticle(SocketIOVerticle())
+        registerCodecs(vertx.eventBus())
+        vertx.deployVerticle(KryoVerticle())
     }
 }

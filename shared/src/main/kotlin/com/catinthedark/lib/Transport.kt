@@ -9,7 +9,7 @@ interface Transport {
      * Send message to other systems.
      * @param msg is message to send
      */
-    fun send(msg: IMessage)
+    fun send(msg: IMessage, withAck: Boolean = true)
 
     /**
      * Set subscriber for messages from other systems.

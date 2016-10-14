@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FillViewport
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.catinthedark.lib.RouteMachine
+import com.catinthedark.lib.network.ConnectionOptions
 import com.catinthedark.squatality.game.screens.GameScreen
 import com.catinthedark.squatality.game.screens.PairingScreen
 import com.catinthedark.squatality.game.screens.SplashScreen
@@ -16,7 +17,7 @@ import com.catinthedark.squatality.game.screens.TitleScreen
 import java.net.URI
 
 class SquatalityGame(
-    private val serverAddress: URI = Const.Network.server
+    private val serverAddress: ConnectionOptions = Const.Network.server
 ) : Game() {
     private val rm = RouteMachine()
 

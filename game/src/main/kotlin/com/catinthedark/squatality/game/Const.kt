@@ -1,5 +1,6 @@
 package com.catinthedark.squatality.game
 
+import com.catinthedark.lib.network.ConnectionOptions
 import java.net.URI
 import java.util.*
 
@@ -15,8 +16,8 @@ object Const {
     }
 
     object Network {
-        val server: URI = URI.create("https://squatality-test.herokuapp.com/")
-        val localServer: URI = URI.create("http://localhost:8080/")
+        val server: ConnectionOptions = ConnectionOptions("https", "squatality-test.herokuapp.com", 80, 80)
+        val localServer: ConnectionOptions = ConnectionOptions(null, "localhost", 54555, 54777)
         val tickRate = 40f
         val syncDelay: Float = 1f / tickRate // in seconds
         /**

@@ -31,8 +31,8 @@ class MessageBus(
      * Publish message to other systems.
      * @param msg is message to publish.
      */
-    fun send(msg: IMessage) {
-        transport.send(msg)
+    fun send(msg: IMessage, withAck: Boolean = true) {
+        transport.send(msg, withAck)
     }
 
     /**

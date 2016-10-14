@@ -97,7 +97,6 @@ class SocketIOVerticle : AbstractVerticle() {
     }
 
     override fun start() {
-        registerCodecs(vertx.eventBus())
         server.addConnectListener(connectHandler)
         server.addDisconnectListener(disconnectHandler)
         server.addEventListener(eventName, String::class.java, messageHandler)

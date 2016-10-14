@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 subprojects {
     repositories {
         jcenter()
+        maven { url "https://clojars.org/repo" }
     }
     buildscript {
         ext.kotlin_version = '1.0.4'
