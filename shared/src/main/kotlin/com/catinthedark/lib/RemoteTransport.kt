@@ -12,7 +12,7 @@ abstract class RemoteTransport(val parser: Parser): Transport {
     override fun send(msg: IMessage, withAck: Boolean) {
         try {
             val data = parser.wrap(msg)
-            remoteSend(data)
+            remoteSend(data, withAck)
         } catch (e: Exception) {
             log.error("Sending error: ${e.message}", e)
         }
