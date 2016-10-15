@@ -41,6 +41,8 @@ class KryoTransport(
         })
     }
 
+    fun latency() = client.returnTripTime
+
     override fun remoteSend(data: String, withAck: Boolean) {
         if (withAck) {
             client.sendTCP(data)

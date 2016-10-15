@@ -1,10 +1,13 @@
 package com.catinthedark.squatality.game.systems
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.IMessage
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.game.Mappers
@@ -16,10 +19,26 @@ import com.catinthedark.squatality.models.State
 import com.catinthedark.squatality.models.ThrowBrickMessage
 
 class KnobAimSystem(
+    private val hudStage: Stage,
     private val send: (IMessage) -> Unit
 ) : IteratingSystem(
     Family.all(KnobComponent::class.java, AimComponent::class.java, StateComponent::class.java, TransformComponent::class.java).get()
 ) {
+    override fun addedToEngine(engine: Engine) {
+        super.addedToEngine(engine)
+        engine.addEntityListener(family, object : EntityListener {
+            override fun entityRemoved(entity: Entity?) {
+                val kc = Mappers.knob[entity] ?: return
+                kc.touchPad?.remove()
+            }
+
+            override fun entityAdded(entity: Entity?) {
+                val kc = Mappers.knob[entity] ?: return
+                hudStage.addActor(kc.touchPad)
+            }
+        })
+    }
+
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val kc = Mappers.knob[entity] ?: return
         val ac = Mappers.aim[entity] ?: return
@@ -34,7 +53,7 @@ class KnobAimSystem(
             if (sc.hasBrick && sc.state == State.IDLE.name) {
                 if (ac.force < Const.Balance.minShootRange) {
                     ac.force = Const.Balance.minShootRange
-                } else if (ac.force < Const.Balance.maxShootRage){
+                } else if (ac.force < Const.Balance.maxShootRage) {
                     ac.force += Const.Balance.shootRageSpeed
                 }
             }

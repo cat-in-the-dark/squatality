@@ -44,6 +44,7 @@ class SquatalityGame(
         rm.addRoute(splash, { title })
         rm.addRoute(title, { pairing })
         rm.addRoute(pairing, { game })
+        rm.addRoute(game, { title })
         rm.start(splash, Unit)
     }
 

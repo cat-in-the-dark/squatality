@@ -18,6 +18,7 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
     }
 
     val onConnected = Observable<NetworkConnector.ConnectMessage>()
+    val onDisconnected = Observable<NetworkConnector.DisconnectMessage>()
     val onServerHello = Observable<ServerHelloMessage>()
     val onGameState = Observable<GameStateModel>()
     val onGameStarted = Observable<GameStartedMessage>()
@@ -28,6 +29,9 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
     }
     val senderUnreliable: (IMessage) -> Unit = {
         messageBus.send(it, false)
+    }
+    val latency: () -> Int = {
+        transport.latency()
     }
 
     private val TAG = "NetworkControl"
@@ -45,6 +49,7 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
         })
         subscribe(NetworkConnector.DisconnectMessage::class.java, {
             Gdx.app.log(TAG, "Disconnected")
+            onDisconnected(it)
         })
         subscribe(GameStartedMessage::class.java, {
             Gdx.app.log(TAG, "$it")
@@ -69,7 +74,11 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
 
     override fun run() {
         Gdx.app.log(TAG, "Connecting")
-        transport.connect()
+        try {
+            transport.connect()
+        } catch (e: Exception) {
+            Gdx.app.log(TAG, e.message, e)
+        }
     }
 
     fun dispose() {

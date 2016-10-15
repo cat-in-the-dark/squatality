@@ -26,6 +26,11 @@ class ClockSystem(
         hudStage.addActor(label)
     }
 
+    override fun removedFromEngine(engine: Engine?) {
+        label.remove()
+        super.removedFromEngine(engine)
+    }
+
     override fun updateInterval() {
         val entity = engine.getEntitiesFor(family).firstOrNull() ?: return
         val cc = Mappers.clock[entity] ?: return

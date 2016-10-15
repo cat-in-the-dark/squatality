@@ -124,7 +124,6 @@ class World(
             ).apply {
                 setBounds(x, y, 250f, 250f)
             }
-            hudStage.addActor(kc.touchPad)
 
             add(kc)
             add(mc)
@@ -142,7 +141,6 @@ class World(
             ).apply {
                 setBounds(x, y, 250f, 250f)
             }
-            hudStage.addActor(kc.touchPad)
 
             add(kc)
             add(ac)

@@ -30,6 +30,7 @@ class PairingScreen(
 
     override fun run(delta: Float): AssetManager? {
         if (hello != null) {
+            hello = null
             return am
         }
         stage.batch.managed {

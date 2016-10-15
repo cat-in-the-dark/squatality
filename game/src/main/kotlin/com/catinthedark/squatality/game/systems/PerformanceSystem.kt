@@ -11,7 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 class PerformanceSystem(
     private val hudStage: Stage,
     private val syncDelta: () -> Long,
-    private val lerpDelay: () -> Long
+    private val lerpDelay: () -> Long,
+    private val latency: () -> Int
 ) : IntervalSystem(0.1f) {
     private val font = BitmapFont()
     private val label = Label(" ", Label.LabelStyle(font, Color.WHITE))
@@ -23,7 +24,12 @@ class PerformanceSystem(
         hudStage.addActor(label)
     }
 
+    override fun removedFromEngine(engine: Engine?) {
+        label.remove()
+        super.removedFromEngine(engine)
+    }
+
     override fun updateInterval() {
-        label.setText(" FPS: ${Gdx.graphics.framesPerSecond}\t SyncDelta: ${syncDelta()} \tLerpDelay: ${lerpDelay()}")
+        label.setText(" FPS: ${Gdx.graphics.framesPerSecond}\t SyncDelta: ${syncDelta()} \tLerpDelay: ${lerpDelay()} \tPing: ${latency()}")
     }
 }

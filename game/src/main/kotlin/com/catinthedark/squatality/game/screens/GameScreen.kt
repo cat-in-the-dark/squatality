@@ -20,14 +20,18 @@ class GameScreen(
     private val stage: Stage,
     private val hudStage: Stage,
     private val nc: NetworkControl
-) : YieldUnit<AssetManager, Any> {
+) : YieldUnit<AssetManager, AssetManager> {
     private val engine = PooledEngine()
     private lateinit var world: World
+    private lateinit var am: AssetManager
     private val TAG = "GameScreen"
+    private var disconnected: Boolean = false
 
     override fun onActivate(data: AssetManager) {
         Gdx.app.log(TAG, "GameScreen started")
-        world = World(engine, data)
+        disconnected = false
+        am = data
+        world = World(engine, am)
         engine.addEntity(world.createSync())
 
         engine.addSystem(RenderingSystem(stage, hudStage))
@@ -42,10 +46,10 @@ class GameScreen(
         engine.addSystem(PlayersSystem())
         engine.addSystem(BricksSystem(world))
         engine.addSystem(BonusesSystem(world))
-        engine.addSystem(KnobMovementSystem())
-        engine.addSystem(KnobAimSystem(nc.sender))
+        engine.addSystem(KnobMovementSystem(hudStage))
+        engine.addSystem(KnobAimSystem(hudStage, nc.sender))
         engine.addSystem(FollowCameraSystem(stage.camera))
-        engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay))
+        engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
         engine.addSystem(ClockSystem(hudStage))
 
         engine.addEntity(world.createField())
@@ -54,19 +58,19 @@ class GameScreen(
         nc.onGameStarted.subscribe { gsm ->
             val enemies = gsm.gameStateModel.players.filter { it.id != gsm.clientId }
             val me = gsm.gameStateModel.players.first { it.id == gsm.clientId }
-            val mainPlayerComponent = world.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(data.get(Assets.Names.Player.BLUE)))
+            val mainPlayerComponent = world.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
             engine.addEntity(mainPlayerComponent)
             engine.addEntity(world.createMovementKnob(30f, 20f, mainPlayerComponent.getComponent(), hudStage))
             engine.addEntity(world.createAimKnob(1000f, 20f, mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), hudStage))
             engine.addEntity(world.createCamera(mainPlayerComponent.getComponent()))
             enemies.forEach { em ->
-                val enemy = world.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
+                val enemy = world.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
                 engine.addEntity(enemy)
             }
         }
 
         nc.onEnemyConnected.subscribe {
-            val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(data.get(Assets.Names.Player.RED)))
+            val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
             engine.addEntity(enemy)
         }
 
@@ -77,12 +81,17 @@ class GameScreen(
             engine.removeEntity(enemy)
         }
 
+        nc.onDisconnected.subscribe { msg ->
+            disconnected = true
+        }
+
         Gdx.input.inputProcessor = hudStage
 
         nc.sender(HelloMessage(Const.Names.random()))
     }
 
-    override fun run(delta: Float): Any? {
+    override fun run(delta: Float): AssetManager? {
+        if (disconnected) return am
         engine.update(delta)
         return null
     }
@@ -90,6 +99,7 @@ class GameScreen(
     override fun onExit() {
         engine.removeAllEntities()
         stage.dispose()
+        hudStage.dispose()
         nc.dispose()
     }
 }
