@@ -1,7 +1,6 @@
 package com.catinthedark.squatality.game
 
 import com.catinthedark.lib.network.ConnectionOptions
-import java.net.URI
 import java.util.*
 
 object Const {

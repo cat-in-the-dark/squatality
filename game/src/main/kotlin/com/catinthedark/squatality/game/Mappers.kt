@@ -17,6 +17,7 @@ object Mappers {
     val knob = ComponentMapper.getFor(KnobComponent::class.java)!!
     val aim = ComponentMapper.getFor(AimComponent::class.java)!!
     val hurt = ComponentMapper.getFor(HurtComponent::class.java)!!
+    val clock = ComponentMapper.getFor(ClockComponent::class.java)!!
 
     object remote {
         val transform = ComponentMapper.getFor(RemoteMoveComponent::class.java)!!

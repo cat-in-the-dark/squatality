@@ -46,6 +46,7 @@ class GameScreen(
         engine.addSystem(KnobAimSystem(nc.sender))
         engine.addSystem(FollowCameraSystem(stage.camera))
         engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay))
+        engine.addSystem(ClockSystem(hudStage))
 
         engine.addEntity(world.createField())
         world.createFans().forEach { engine.addEntity(it) }

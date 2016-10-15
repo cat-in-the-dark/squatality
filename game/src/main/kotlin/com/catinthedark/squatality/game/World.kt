@@ -166,9 +166,11 @@ class World(
             val brc: BricksComponent = engine.createComponent()
             val bc: BonusesComponent = engine.createComponent()
             val pc: PlayersComponent = engine.createComponent()
+            val cc: ClockComponent = engine.createComponent()
             add(brc)
             add(bc)
             add(pc)
+            add(cc)
         }
     }
 
