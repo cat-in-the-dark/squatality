@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IMessage
+import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Listener
@@ -125,7 +126,7 @@ class KryoVerticle : AbstractVerticle() {
 
         registerReverseHandler()
         var lastTick = System.nanoTime()
-        vertx.setPeriodic(tickDelay, {
+        vertx.setPeriodic(Const.Network.Server.tickDelay, {
             val currentTime = System.nanoTime()
             vertx.eventBus().publish(Addressing.onTick(), (currentTime - lastTick) / 1000000)
             lastTick = currentTime

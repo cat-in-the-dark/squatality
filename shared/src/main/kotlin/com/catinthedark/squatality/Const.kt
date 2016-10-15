@@ -51,4 +51,23 @@ object Const {
         val bonusesAtOnce = 2
         fun randomBonus() = Bonus.hat
     }
+
+    object Network {
+        object Server {
+            val tickRate = 20f
+            val tickDelay = (1000f / tickRate).toLong() // in milliseconds
+        }
+        object Client {
+            val tickRate = 40f
+            val syncDelay: Float = 1f / tickRate // in seconds
+            /**
+             * Using GSM we have msg delay of 200-300ms, so constrain in 200ms obviously make movements sharp, but precise!
+             * We can set lerp delay in 500ms and more, so moves will be smooth but very delayed.
+             * It's kind of trade-off
+             * Using WiFi we have msg delay of 60-120ms, so lerpDelay should not be reached
+             * This const can me player-configurable prior to his skills and decision - sharp or smooth game.
+             */
+            val lerpDelay: Long = 1500 // in ms
+        }
+    }
 }

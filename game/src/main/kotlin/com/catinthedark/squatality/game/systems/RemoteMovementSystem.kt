@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.catinthedark.lib.IMessage
-import com.catinthedark.squatality.game.Const
+import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.MoveComponent
@@ -38,7 +38,7 @@ class RemoteMovementSystem(
     }
 
     private fun sync(rtc: RemoteMoveComponent) {
-        if (rtc.lastSync < Const.Network.syncDelay) return
+        if (rtc.lastSync < Const.Network.Client.syncDelay) return
 
         val state = if (rtc.velocity.isZero) {
             State.IDLE
@@ -47,6 +47,6 @@ class RemoteMovementSystem(
         }
         send(MoveMessage(speedX = rtc.velocity.x, speedY = rtc.velocity.y, angle = rtc.angle, stateName = state.name))
         rtc.velocity.setZero()
-        rtc.lastSync -= Const.Network.syncDelay
+        rtc.lastSync -= Const.Network.Client.syncDelay
     }
 }

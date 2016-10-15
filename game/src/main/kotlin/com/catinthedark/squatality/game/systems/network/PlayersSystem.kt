@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.math.Vector3
+import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.LerpTransformComponent
 import com.catinthedark.squatality.game.components.LerpTransformElement
@@ -41,11 +42,19 @@ class PlayersSystem : NetworkSystem<PlayerModel>() {
                 prevPos = Vector3(target.previousX, target.previousY, 0f),
                 pos = Vector3(target.x, target.y, 0f),
                 angle = target.angle
-            ), ltc.syncDelta)
+            ), delay(ltc.syncDelta))
             ltc.syncDelta = 0L
         }
         ltc.syncDelta += delay
         sc.state = target.state.name
         sc.hasBrick = target.hasBrick
+    }
+
+    private fun delay(delta: Long): Long {
+        return if (delta > Const.Network.Server.tickDelay) {
+            Const.Network.Server.tickDelay
+        } else {
+            delta
+        }
     }
 }
