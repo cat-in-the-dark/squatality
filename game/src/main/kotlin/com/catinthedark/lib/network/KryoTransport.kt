@@ -2,6 +2,7 @@ package com.catinthedark.lib.network
 
 import com.catinthedark.lib.Parser
 import com.catinthedark.lib.RemoteTransport
+import com.catinthedark.lib.TimeCache
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Listener
@@ -12,6 +13,9 @@ class KryoTransport(
     private val options: ConnectionOptions
 ) : RemoteTransport(parser), NetworkConnector {
     private val log = LoggerFactory.getLogger(KryoTransport::class.java)
+    private val latencyCache = TimeCache({
+        calcLatency()
+    }, 1000L)
 
     private val client = Client().apply {
         addListener(object : Listener() {
@@ -41,7 +45,12 @@ class KryoTransport(
         })
     }
 
-    fun latency() = client.returnTripTime
+    fun latency() = latencyCache.get() ?: 0
+
+    private fun calcLatency(): Int {
+        client.updateReturnTripTime()
+        return client.returnTripTime
+    }
 
     override fun remoteSend(data: String, withAck: Boolean) {
         if (withAck) {
