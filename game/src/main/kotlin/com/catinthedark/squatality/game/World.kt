@@ -175,6 +175,7 @@ class World(
     fun createBrick(brick: BrickModel): Entity {
         return engine.createEntity().apply {
             val trc: TransformComponent = engine.createComponent()
+            val ltc: LerpTransformComponent = engine.createComponent()
             val tc: TextureComponent = engine.createComponent()
             val ric: RemoteIDComponent = engine.createComponent()
             val hc: HurtComponent = engine.createComponent()
@@ -191,6 +192,7 @@ class World(
             add(trc)
             add(ric)
             add(hc)
+            add(ltc)
         }
     }
 

@@ -67,6 +67,8 @@ class RoomService(
                     angle = msg.angle,
                     x = msg.x,
                     y = msg.y,
+                    previousX = msg.x,
+                    previousY = msg.y,
                     hurting = true),
                 initialSpeed = msg.force,
                 currentSpeed = msg.force,
@@ -86,6 +88,8 @@ class RoomService(
                         angle = 0.0,
                         x = playerToRemove.model.x,
                         y = playerToRemove.model.y,
+                        previousX = playerToRemove.model.x,
+                        previousY = playerToRemove.model.y,
                         hurting = false),
                     currentSpeed = 0f,
                     initialSpeed = 0f)
@@ -120,6 +124,11 @@ class RoomService(
             it.value.model.updated = false
         }
 
+        bricks.forEach {
+            it.model.previousX = it.model.x
+            it.model.previousY = it.model.y
+        }
+
         return models
     }
 
@@ -146,6 +155,8 @@ class RoomService(
                 id = UUID.randomUUID(),
                 x = pos.x,
                 y = pos.y,
+                previousX = pos.x,
+                previousY = pos.y,
                 angle = 0.0,
                 hurting = false),
             currentSpeed = 0f,

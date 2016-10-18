@@ -31,6 +31,8 @@ data class BrickModel(
     val id: UUID,
     var x: Float,
     var y: Float,
+    var previousX: Float,
+    var previousY: Float,
     var angle: Double,
     var hurting: Boolean) : Model
 

@@ -48,6 +48,7 @@ class PlayersSystem : NetworkSystem<PlayerModel>() {
         ltc.syncDelta += delay
         sc.state = target.state.name
         sc.hasBrick = target.hasBrick
+        sc.bonuses = target.bonuses
     }
 
     private fun delay(delta: Long): Long {

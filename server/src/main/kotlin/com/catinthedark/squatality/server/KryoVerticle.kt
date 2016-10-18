@@ -43,7 +43,7 @@ class KryoVerticle : AbstractVerticle() {
 
         override fun received(connection: Connection, data: Any?) {
             if (data == null || data !is String) {
-                logger.warn("Can't handle message $data")
+                logger.debug("Can't handle message $data")
                 return
             }
 

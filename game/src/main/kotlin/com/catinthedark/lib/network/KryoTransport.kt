@@ -39,7 +39,7 @@ class KryoTransport(
                 if (data != null && data is String) {
                     onReceive(data)
                 } else {
-                    log.warn("onReceived unknown data: $data")
+                    log.debug("onReceived unknown data: $data")
                 }
             }
         })
