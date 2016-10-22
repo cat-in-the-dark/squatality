@@ -5,7 +5,7 @@ import com.catinthedark.math.Vector2
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import com.catinthedark.squatality.server.math.IntersectService
-import io.vertx.core.logging.LoggerFactory
+import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -97,7 +97,7 @@ class RoomService(
             players.remove(clientID)
             return clientID
         }
-        logger.info("Room size: ${players.size}")
+        logger.info("RoomHandlers size: ${players.size}")
         return null
     }
 
