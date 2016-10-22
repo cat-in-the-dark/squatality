@@ -9,13 +9,13 @@ import java.util.concurrent.LinkedBlockingDeque
  * It's queue of method calls.
  */
 class InvokeQueue : Runnable {
-    private val queue: BlockingQueue<Pair<() -> Any?, (Any?) -> Unit>> = LinkedBlockingDeque()
+    private val queue: BlockingQueue<() -> Any?> = LinkedBlockingDeque()
     private var shouldStop: Boolean = false
     val LOG: Logger = LoggerFactory.getLogger(InvokeQueue::class.java)
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> put(call: () -> T?, callback: (T?) -> Unit) {
-        queue.put(Pair(call as () -> Any?, callback as (Any?) -> Unit))
+    fun <T> put(call: () -> T?) {
+        queue.put(call)
     }
 
     fun stop() {
@@ -25,8 +25,7 @@ class InvokeQueue : Runnable {
     override fun run() {
         try {
             while (!shouldStop) {
-                val task = queue.take()
-                consume(task.first, task.second)
+                consume(queue.take())
             }
             LOG.info("Gracefully exit ${Thread.currentThread().id}. Has ${queue.size} tasks unfinished.")
         } catch (e: InterruptedException) {
@@ -36,9 +35,9 @@ class InvokeQueue : Runnable {
         }
     }
 
-    inline fun consume(call: () -> Any?, callback: (Any?) -> Unit) {
+    inline fun consume(call: () -> Any?) {
         try {
-            callback(call())
+            call()
         } catch (e: Exception) {
             LOG.error("Call error: ${e.message}", e)
         }

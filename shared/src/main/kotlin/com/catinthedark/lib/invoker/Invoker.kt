@@ -18,9 +18,7 @@ class Invoker(
         val f = CompletableFuture<R?>()
 
         queue.put({
-            func.invoke(invokable)
-        }, { data ->
-            f.complete(data)
+            f.complete(func.invoke(invokable))
         })
 
         return f
@@ -30,9 +28,7 @@ class Invoker(
         val f = CompletableFuture<R?>()
 
         queue.put({
-            func.invoke(invokable, arg)
-        }, { data ->
-            f.complete(data)
+            f.complete(func.invoke(invokable, arg))
         })
 
         return f
@@ -42,9 +38,7 @@ class Invoker(
         val f = CompletableFuture<R?>()
 
         queue.put({
-            func.invoke(invokable, arg1, arg2)
-        }, { data ->
-            f.complete(data)
+            f.complete(func.invoke(invokable, arg1, arg2))
         })
 
         return f
@@ -54,9 +48,7 @@ class Invoker(
         val f = CompletableFuture<R?>()
 
         queue.put({
-            func.invoke(invokable, arg1, arg2, arg3)
-        }, { data ->
-            f.complete(data)
+            f.complete(func.invoke(invokable, arg1, arg2, arg3))
         })
 
         return f
