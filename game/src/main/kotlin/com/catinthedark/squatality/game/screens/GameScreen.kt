@@ -1,5 +1,7 @@
 package com.catinthedark.squatality.game.screens
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
@@ -8,7 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
+import com.catinthedark.squatality.game.components.FollowingTransformComponent
 import com.catinthedark.squatality.game.components.RemoteIDComponent
+import com.catinthedark.squatality.game.components.StateComponent
+import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
@@ -51,6 +56,7 @@ class GameScreen(
         engine.addSystem(FollowCameraSystem(stage.camera))
         engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
         engine.addSystem(ClockSystem(hudStage))
+        engine.addSystem(FollowingTransformSystem())
 
         engine.addEntity(world.createField())
         world.createFans().forEach { engine.addEntity(it) }
@@ -68,6 +74,18 @@ class GameScreen(
                 engine.addEntity(enemy)
             }
         }
+
+        engine.addEntityListener(Family.all(RemoteIDComponent::class.java, TransformComponent::class.java, StateComponent::class.java).get(), object : EntityListener {
+            override fun entityRemoved(entity: Entity?) {
+                //TODO: should we remove hat entity?
+            }
+
+            override fun entityAdded(entity: Entity?) {
+                val tc: TransformComponent = entity?.getComponent() ?: return
+                val sc: StateComponent = entity?.getComponent() ?: return
+                engine.addEntity(world.createHat(tc, sc))
+            }
+        })
 
         nc.onEnemyConnected.subscribe {
             val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))

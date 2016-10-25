@@ -9,6 +9,7 @@ import com.catinthedark.squatality.game.components.network.PlayersComponent
 object Mappers {
     val lerpTransform = ComponentMapper.getFor(LerpTransformComponent::class.java)!!
     val transform = ComponentMapper.getFor(TransformComponent::class.java)!!
+    val followingTransform = ComponentMapper.getFor(FollowingTransformComponent::class.java)!!
     val texture = ComponentMapper.getFor(TextureComponent::class.java)!!
     val camera = ComponentMapper.getFor(CameraComponent::class.java)!!
     val animation = ComponentMapper.getFor(AnimationComponent::class.java)!!

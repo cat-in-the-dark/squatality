@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.catinthedark.lib.ashley.createComponent
+import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.components.network.BonusesComponent
 import com.catinthedark.squatality.game.components.network.BricksComponent
@@ -28,7 +29,7 @@ class World(
      * General unit. Can be either enemy or player.
      */
     fun createUnit(id: UUID, x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
-        return with(engine.createEntity(), {
+        return engine.createEntity().apply {
             val ac: AnimationComponent = engine.createComponent()
             val tc: TextureComponent = engine.createComponent()
             val sc: StateComponent = engine.createComponent()
@@ -56,14 +57,14 @@ class World(
             add(trc)
             add(ric)
             add(ltc)
-        })
+        }
     }
 
     /**
      * Controllable unit. It's player.
      */
     fun createPlayer(id: UUID, x: Float = 0f, y: Float = 0f, skin: Assets.PlayerSkin): Entity {
-        return with(createUnit(id, x, y, skin), {
+        return createUnit(id, x, y, skin).apply {
             val mc: MoveComponent = engine.createComponent()
             val aimC: AimComponent = engine.createComponent()
             val rmc: RemoteMoveComponent = engine.createComponent()
@@ -74,7 +75,35 @@ class World(
             add(mc)
             add(aimC)
             add(rmc)
-        })
+        }
+    }
+
+    fun createHat(followToTrc: TransformComponent, targetState: StateComponent): Entity {
+        return engine.createEntity().apply {
+            val tc: TextureComponent = engine.createComponent()
+            val trc: TransformComponent = engine.createComponent()
+            val ftrc: FollowingTransformComponent = engine.createComponent()
+            ftrc.target = followToTrc
+            ftrc.strategy = { from, to ->
+                if (from != null && targetState.bonuses.contains(Const.Bonus.hat)) {
+                    to.pos.x = from.pos.x
+                    to.pos.y = from.pos.y
+                    to.pos.z = from.pos.z + 1
+                    to.angle = from.angle
+                } else {
+                    // is it ok?
+                    to.pos.x = -10000f
+                    to.pos.y = -10000f
+                    to.pos.z = -1000f
+                }
+            }
+            tc.centered = true
+            tc.region = TextureRegion(am.get(Assets.Names.BONUS, Texture::class.java))
+
+            add(tc)
+            add(ftrc)
+            add(trc)
+        }
     }
 
     fun createFan(x: Float, y: Float, angle: Float, skin: Assets.FanSkin): Entity {
