@@ -8,10 +8,24 @@ def gitCommitCount =
         Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
 
 buildscript {
+    ext.kotlin_version = '1.0.4'
+    repositories {
+        jcenter()
+    }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.google.gms:google-services:3.0.0'
     }
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+ext {
+    gdxVersion = '1.9.4'
 }
 
 android {

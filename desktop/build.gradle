@@ -5,9 +5,23 @@ group 'com.catinthedark.squatality'
 version "$gitCommitCount-SNAPSHOT"
 
 buildscript {
+    ext.kotlin_version = '1.0.4'
+    repositories {
+        jcenter()
+    }
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+ext {
+    gdxVersion = '1.9.4'
 }
 
 apply plugin: 'idea'
