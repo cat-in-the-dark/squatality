@@ -8,18 +8,8 @@ import com.catinthedark.lib.network.ConnectionOptions
 import com.catinthedark.lib.network.KryoTransport
 import com.catinthedark.lib.network.NetworkConnector
 import com.catinthedark.squatality.models.*
-import de.javakaffee.kryoserializers.ArraysAsListSerializer
-import de.javakaffee.kryoserializers.UUIDSerializer
-import java.util.*
 
 class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
-    init {
-        MessageConverter.register(NetworkConnector.DisconnectMessage::class.java)
-        MessageConverter.register(NetworkConnector.ConnectErrorMessage::class.java)
-        MessageConverter.register(NetworkConnector.ConnectMessage::class.java)
-        MessageConverter.register(NetworkConnector.ReConnectMessage::class.java)
-    }
-
     val onConnected = Observable<NetworkConnector.ConnectMessage>()
     val onDisconnected = Observable<NetworkConnector.DisconnectMessage>()
     val onServerHello = Observable<ServerHelloMessage>()
@@ -38,26 +28,7 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
     }
 
     private val TAG = "NetworkControl"
-    private val transport = KryoTransport({
-        it.apply {
-            register(UUID::class.java, UUIDSerializer())
-            register(ArrayList::class.java)
-            register(EnemyConnectedMessage::class.java)
-            register(EnemyDisconnectedMessage::class.java)
-            register(GameStartedMessage::class.java)
-            register(RoundEndsMessage::class.java)
-            register(HelloMessage::class.java)
-            register(ServerHelloMessage::class.java)
-            register(MoveMessage::class.java)
-            register(GameStateMessage::class.java)
-            register(ThrowBrickMessage::class.java)
-            register(GameStateModel::class.java)
-            register(BonusModel::class.java)
-            register(BrickModel::class.java)
-            register(PlayerModel::class.java)
-            register(State::class.java)
-        }
-    }, serverAddress)
+    private val transport = KryoTransport(MessageConverter.kryoRegister, serverAddress)
     private val messageBus = MessageBus(transport).apply {
         subscribe(NetworkConnector.ConnectMessage::class.java, {
             Gdx.app.log(TAG, "Connected ${it.id}")

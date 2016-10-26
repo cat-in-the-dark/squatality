@@ -33,10 +33,6 @@ dependencies {
     compile("com.github.anubiann00b:kryonet:b6b71d4") {
         exclude module: 'kryo'
     }
-    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
-    compile('de.javakaffee:kryo-serializers:0.41') {
-        exclude module: 'kryo'
-    }
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.ashley:ashley:1.7.3"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

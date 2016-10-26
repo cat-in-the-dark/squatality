@@ -1,35 +1,28 @@
 package com.catinthedark.squatality.models
 
-import com.catinthedark.lib.IMessage
-import com.catinthedark.lib.JsonConverter
-import com.catinthedark.lib.Parser
-import com.catinthedark.lib.Register
+import com.catinthedark.lib.kryo.UUIDSerializer
+import com.esotericsoftware.kryo.Kryo
+import java.util.*
 
 object MessageConverter {
-    private val converter = JsonConverter()
-
-    init {
-        registerMessages(converter)
-    }
-
-    val parser: Parser
-        get() = converter
-
-    private fun registerMessages(register: Register) {
-        register.addAll(listOf(
-            EnemyConnectedMessage::class.java,
-            EnemyDisconnectedMessage::class.java,
-            GameStartedMessage::class.java,
-            RoundEndsMessage::class.java,
-            HelloMessage::class.java,
-            ServerHelloMessage::class.java,
-            MoveMessage::class.java,
-            GameStateMessage::class.java,
-            ThrowBrickMessage::class.java
-        ))
-    }
-
-    fun <T : IMessage> register(clazz: Class<T>) {
-        converter.add(clazz)
+    val kryoRegister: (Kryo) -> Unit = {
+        it.apply {
+            register(UUID::class.java, UUIDSerializer())
+            register(ArrayList::class.java)
+            register(EnemyConnectedMessage::class.java)
+            register(EnemyDisconnectedMessage::class.java)
+            register(GameStartedMessage::class.java)
+            register(RoundEndsMessage::class.java)
+            register(HelloMessage::class.java)
+            register(ServerHelloMessage::class.java)
+            register(MoveMessage::class.java)
+            register(GameStateMessage::class.java)
+            register(ThrowBrickMessage::class.java)
+            register(GameStateModel::class.java)
+            register(BonusModel::class.java)
+            register(BrickModel::class.java)
+            register(PlayerModel::class.java)
+            register(State::class.java)
+        }
     }
 }
