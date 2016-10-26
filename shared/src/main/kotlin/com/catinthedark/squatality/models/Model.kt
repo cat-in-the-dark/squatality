@@ -6,38 +6,38 @@ import java.util.*
 interface Model : Serializable
 
 data class GameStateModel(
-    val players: List<PlayerModel>,
-    val bricks: List<BrickModel>,
-    val bonuses: List<BonusModel>,
-    val time: Long) : Model
+    val players: List<PlayerModel> = emptyList(),
+    val bricks: List<BrickModel> = emptyList(),
+    val bonuses: List<BonusModel> = emptyList(),
+    val time: Long = 0) : Model
 
 data class PlayerModel(
-    val id: UUID,
-    val name: String,
+    val id: UUID = UUID.randomUUID(),
+    val name: String = "",
     var updated: Boolean = true,
-    var previousX: Float,
-    var previousY: Float,
-    var x: Float,
-    var y: Float,
-    var angle: Float,
-    var state: State,
-    var skin: String,
+    var previousX: Float = 0f,
+    var previousY: Float = 0f,
+    var x: Float = 0f,
+    var y: Float = 0f,
+    var angle: Float = 0f,
+    var state: State = State.IDLE,
+    var skin: String = "",
     val bonuses: MutableList<String> = arrayListOf(),
     var frags: Int = 0,
     var deaths: Int = 0,
     var hasBrick: Boolean = false) : Model
 
 data class BrickModel(
-    val id: UUID,
-    var x: Float,
-    var y: Float,
-    var previousX: Float,
-    var previousY: Float,
-    var angle: Double,
-    var hurting: Boolean) : Model
+    val id: UUID = UUID.randomUUID(),
+    var x: Float = 0f,
+    var y: Float = 0f,
+    var previousX: Float = 0f,
+    var previousY: Float = 0f,
+    var angle: Double = 0.0,
+    var hurting: Boolean = false) : Model
 
 data class BonusModel(
-    val id: UUID,
-    val x: Float,
-    val y: Float,
-    val typeName: String) : Model
+    val id: UUID = UUID.randomUUID(),
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val typeName: String = "") : Model

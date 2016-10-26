@@ -5,9 +5,12 @@ import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.SimpleExecutor
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
+import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
+import de.javakaffee.kryoserializers.ArraysAsListSerializer
+import de.javakaffee.kryoserializers.UUIDSerializer
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -58,20 +61,19 @@ class KryoService {
         }
 
         override fun received(connection: Connection, data: Any?) {
-            if (data == null || data !is String) {
+            if (data == null || data !is IMessage) {
                 logger.debug("Can't handle message $data")
                 return
             }
 
             try {
                 val clientID = clientIdToUUID[connection.id] ?: return
-                val msg = MessageConverter.parser.unwrap(data)
                 val room = roomRegister[clientsInRoom[clientID]] ?: return
-                when (msg) {
-                    is HelloMessage -> room.invoke(RoomHandlers::onHello, msg, clientID)
-                    is MoveMessage -> room.invoke(RoomHandlers::onMove, msg, clientID)
-                    is ThrowBrickMessage -> room.invoke(RoomHandlers::onThrowBrick, msg, clientID)
-                    else -> logger.warn("Undefined message $msg")
+                when (data) {
+                    is HelloMessage -> room.invoke(RoomHandlers::onHello, data, clientID)
+                    is MoveMessage -> room.invoke(RoomHandlers::onMove, data, clientID)
+                    is ThrowBrickMessage -> room.invoke(RoomHandlers::onThrowBrick, data, clientID)
+                    else -> logger.warn("Undefined message $data")
                 }
             } catch (e: Exception) {
                 logger.error("Can't handle message $data: ${e.message}", e)
@@ -101,7 +103,7 @@ class KryoService {
             logger.warn("Can't find client with id $clientID")
             return
         }
-        server.sendToTCP(id, MessageConverter.parser.wrap(msg))
+        server.sendToTCP(id, msg)
     }
 
     /**
@@ -115,13 +117,15 @@ class KryoService {
             logger.warn("Can't find client with id $clientID")
             return
         }
-        server.sendToUDP(id, MessageConverter.parser.wrap(msg))
+        server.sendToUDP(id, msg)
     }
 
     fun start() {
         server.addListener(listener)
         server.start()
         server.bind(Configs.tcpPort, Configs.udpPort)
+
+        setupKryo(server.kryo)
 
         var lastTick = System.nanoTime()
         executor.periodic(Const.Network.Server.tickDelay, TimeUnit.MILLISECONDS, {
@@ -134,5 +138,26 @@ class KryoService {
 
     fun stop() {
         server.removeListener(listener)
+    }
+
+    private fun setupKryo(kryo: Kryo) {
+        kryo.apply {
+            register(UUID::class.java, UUIDSerializer())
+            register(ArrayList::class.java)
+            register(EnemyConnectedMessage::class.java)
+            register(EnemyDisconnectedMessage::class.java)
+            register(GameStartedMessage::class.java)
+            register(RoundEndsMessage::class.java)
+            register(HelloMessage::class.java)
+            register(ServerHelloMessage::class.java)
+            register(MoveMessage::class.java)
+            register(GameStateMessage::class.java)
+            register(ThrowBrickMessage::class.java)
+            register(GameStateModel::class.java)
+            register(BonusModel::class.java)
+            register(BrickModel::class.java)
+            register(PlayerModel::class.java)
+            register(State::class.java)
+        }
     }
 }

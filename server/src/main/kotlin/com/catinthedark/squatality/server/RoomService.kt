@@ -226,12 +226,6 @@ class RoomService(
                     p1.value.model.deaths += 1
                     players.values.forEach { player ->
                         // TODO: sounds have to reach clients
-                        val sound = SoundMessage(
-                            when (Random().nextInt(10)) {
-                                1 -> SoundName.ChponkSuka
-                                2 -> SoundName.Tooth
-                                else -> SoundName.HeadShot
-                            })
                     }
                     killerBricks.forEach { brick ->
                         val throwerID = brick.throwerID

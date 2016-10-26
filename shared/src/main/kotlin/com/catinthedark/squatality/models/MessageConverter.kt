@@ -25,7 +25,6 @@ object MessageConverter {
             ServerHelloMessage::class.java,
             MoveMessage::class.java,
             GameStateMessage::class.java,
-            SoundMessage::class.java,
             ThrowBrickMessage::class.java
         ))
     }
