@@ -56,10 +56,12 @@ class KnobAimSystem(
                 } else if (ac.force < Const.Balance.maxShootRage) {
                     ac.force += Const.Balance.shootRageSpeed
                 }
+            } else {
+                ac.force = 0f // prevent keeping unused force :)
             }
         } else {
             ac.aiming = false
-            if (ac.force > 0 && sc.hasBrick) {
+            if (ac.force >= Const.Balance.minShootRange && sc.hasBrick) {
                 throwBrick(tc.pos, ac.angle, ac.force)
                 sc.hasBrick = false
                 ac.force = 0f
