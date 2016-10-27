@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IExecutor
+import com.catinthedark.lib.IMessage
 import com.catinthedark.math.Vector2
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
@@ -22,6 +23,12 @@ class RoomService(
     private val bricks: MutableList<Brick> = arrayListOf()
     private var time: Long = 0
     private val intersect = IntersectService()
+    /**
+     * In this queue we can put messages to send them out of system.
+     * For example, send some game events, that should not be in the game state.
+     * I.e. kill-events,...
+     */
+    val output: Queue<Message> = LinkedList()
 
     fun playersExcept(id: UUID): Set<UUID> {
         return players.filterKeys { it != id }.keys
@@ -224,18 +231,27 @@ class RoomService(
                 } else {
                     p1.value.model.state = State.KILLED
                     p1.value.model.deaths += 1
-                    players.values.forEach { player ->
-                        // TODO: sounds have to reach clients
-                    }
-                    killerBricks.forEach { brick ->
+
+                    val killers = killerBricks.map { brick ->
                         val throwerID = brick.throwerID
                         if (throwerID != null) {
                             val player = players[throwerID]
                             if (player != null) {
                                 player.model.frags += 1
                             }
+                            player
+                        } else {
+                            null
                         }
-                    }
+                    }.filterNotNull()
+
+                    output.add(Message(KillMessage(
+                        victimId = p1.value.model.id,
+                        victimName = p1.value.model.name,
+                        killerIds = killers.map { it.model.id },
+                        killerNames = killers.map { it.model.name }
+                    ), players.keys.toList()))
+
                     executor.deffer(2, TimeUnit.SECONDS, {
                         p1.value.model.state = State.IDLE
                     })
@@ -310,4 +326,9 @@ class RoomService(
             return pos.dst(player.pos) < (Const.Balance.playerRadius * 2)
         }
     }
+
+    data class Message(
+        val body: IMessage,
+        val to: List<UUID>
+    )
 }

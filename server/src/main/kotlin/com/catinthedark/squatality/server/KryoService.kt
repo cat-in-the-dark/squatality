@@ -19,24 +19,20 @@ class KryoService {
     private val server: Server = Server()
     private val roomRegister = RoomRegister()
     private val executor: IExecutor = SimpleExecutor()
-    private val events = object : ServerHandlers {
-        override fun emit(msg: GameStartedMessage, clientID: UUID) {
-            pushTCP(clientID, msg)
+    /**
+     * We need this to make RoomService unaware of transport system - udp or tcp.
+     */
+    private val publish: (IMessage, UUID) -> Unit = { msg, clientID ->
+        when (msg) {
+            is GameStartedMessage -> pushTCP(clientID, msg)
+            is GameStateMessage -> pushUDP(clientID, msg)
+            is EnemyConnectedMessage -> pushTCP(clientID, msg)
+            is EnemyDisconnectedMessage -> pushTCP(clientID, msg)
+            is KillMessage -> pushTCP(clientID, msg)
+            else -> logger.warn("Unknown message $msg")
         }
-
-        override fun emit(msg: GameStateMessage, clientID: UUID) {
-            pushUDP(clientID, msg)
-        }
-
-        override fun emit(msg: EnemyConnectedMessage, clientID: UUID) {
-            pushTCP(clientID, msg)
-        }
-
-        override fun emit(msg: EnemyDisconnectedMessage, clientID: UUID) {
-            pushTCP(clientID, msg)
-        }
-
     }
+
     private val listener = object : Listener() {
         override fun connected(connection: Connection) {
             val clientID = UUID.randomUUID()
@@ -82,7 +78,7 @@ class KryoService {
         val rooms = clientsInRoom.values.toSet()
         if (rooms.isEmpty()) {
             val roomID = UUID.randomUUID()
-            roomRegister.register(roomID, events, executor)
+            roomRegister.register(roomID, publish, executor)
             callback(roomID)
         } else {
             callback(rooms.first())

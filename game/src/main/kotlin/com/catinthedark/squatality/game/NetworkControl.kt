@@ -63,6 +63,9 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
             Gdx.app.log(TAG, "EnemyDisconnectedMessage $it")
             onEnemyDisconnected(it)
         })
+        subscribe(KillMessage::class.java, {
+            Gdx.app.log(TAG, "KillMessage $it")
+        })
     }
 
     override fun run() {

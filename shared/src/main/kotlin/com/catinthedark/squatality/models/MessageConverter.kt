@@ -19,6 +19,7 @@ object MessageConverter {
             register(GameStateMessage::class.java)
             register(ThrowBrickMessage::class.java)
             register(GameStateModel::class.java)
+            register(KillMessage::class.java)
             register(BonusModel::class.java)
             register(BrickModel::class.java)
             register(PlayerModel::class.java)

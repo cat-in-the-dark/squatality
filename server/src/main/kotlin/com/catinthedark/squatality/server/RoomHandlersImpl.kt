@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IExecutor
+import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.SimpleExecutor
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit
 class RoomHandlersImpl(
     val roomID: UUID,
     val roomRegister: RoomRegister,
-    private val handlers: ServerHandlers,
+    private val publish: (IMessage, UUID) -> Unit,
     private val executor: IExecutor = SimpleExecutor()
 ) : RoomHandlers {
     private val LOG = LoggerFactory.getLogger(RoomHandlersImpl::class.java)!!
@@ -37,9 +38,9 @@ class RoomHandlersImpl(
     override fun onHello(msg: HelloMessage, clientID: UUID) {
         val id = service.onNewClient(msg, clientID) ?: return
         val gsm = service.buildGameStateModel()
-        handlers.emit(GameStartedMessage(id, gsm), clientID)
+        publish(GameStartedMessage(id, gsm), clientID)
         service.playersExcept(id).forEach {
-            handlers.emit(EnemyConnectedMessage(id), it)
+            publish(EnemyConnectedMessage(id), it)
         }
     }
 
@@ -51,7 +52,7 @@ class RoomHandlersImpl(
         LOG.info("RoomHandlers-$roomID onDisconnect: $clientID")
         service.onDisconnect(clientID)
         service.playersExcept(clientID).forEach {
-            handlers.emit(EnemyDisconnectedMessage(clientID), it)
+            publish(EnemyDisconnectedMessage(clientID), it)
         }
         if (service.shouldStop()) {
             roomRegister.unregister(roomID)
@@ -62,7 +63,11 @@ class RoomHandlersImpl(
         val states = service.onTick(deltaTime)
         states.forEach { state ->
             val gmm = GameStateMessage(state.second)
-            handlers.emit(gmm, state.first)
+            publish(gmm, state.first)
+        }
+        while(service.output.isNotEmpty()) {
+            val msg = service.output.poll()
+            msg.to.forEach { publish(msg.body, it) }
         }
     }
 

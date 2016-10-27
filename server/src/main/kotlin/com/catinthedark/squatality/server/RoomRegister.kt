@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IExecutor
+import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.invoker.InvokeService
 import com.catinthedark.lib.invoker.InvokeWrapper
 import org.slf4j.LoggerFactory
@@ -17,8 +18,8 @@ class RoomRegister {
         LOG.info("Rooms online: ${map.size}")
     }
 
-    fun register(id: UUID, handlers: ServerHandlers, executor: IExecutor) {
-        map[id] = invoker.wrap(RoomHandlersImpl(id, this, handlers, executor))
+    fun register(id: UUID, publish: (IMessage, UUID) -> Unit, executor: IExecutor) {
+        map[id] = invoker.wrap(RoomHandlersImpl(id, this, publish, executor))
         LOG.info("RoomHandlers-$id started")
     }
 
