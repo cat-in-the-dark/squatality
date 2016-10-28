@@ -37,12 +37,8 @@ class KryoService {
         override fun connected(connection: Connection) {
             val clientID = UUID.randomUUID()
             clientIdToUUID[connection.id] = clientID
-
-            findOrCreateRoom { id ->
-                clientsInRoom[clientID] = id
-                pushTCP(clientID, ServerHelloMessage(clientID))
-                logger.info("Connected client $clientID")
-            }
+            pushTCP(clientID, ServerHelloMessage(clientID))
+            logger.info("Connected client $clientID")
         }
 
         override fun disconnected(connection: Connection) {
@@ -61,11 +57,18 @@ class KryoService {
 
             try {
                 val clientID = clientIdToUUID[connection.id] ?: return
-                val room = roomRegister[clientsInRoom[clientID]] ?: return
                 when (data) {
-                    is HelloMessage -> room.invoke(RoomHandlers::onHello, data, clientID)
-                    is MoveMessage -> room.invoke(RoomHandlers::onMove, data, clientID)
-                    is ThrowBrickMessage -> room.invoke(RoomHandlers::onThrowBrick, data, clientID)
+                    is HelloMessage -> {
+                        findOrCreateRoom(clientID, data)
+                    }
+                    is MoveMessage -> {
+                        val room = roomRegister[clientsInRoom[clientID]]
+                        room?.invoke(RoomHandlers::onMove, data, clientID)
+                    }
+                    is ThrowBrickMessage -> {
+                        val room = roomRegister[clientsInRoom[clientID]]
+                        room?.invoke(RoomHandlers::onThrowBrick, data, clientID)
+                    }
                     else -> logger.warn("Undefined message $data")
                 }
             } catch (e: Exception) {
@@ -74,15 +77,29 @@ class KryoService {
         }
     }
 
-    private fun findOrCreateRoom(callback: (UUID) -> Unit) {
-        val rooms = clientsInRoom.values.toSet()
-        if (rooms.isEmpty()) {
-            val roomID = UUID.randomUUID()
-            roomRegister.register(roomID, publish, executor)
-            callback(roomID)
-        } else {
-            callback(rooms.first())
+    private fun findOrCreateRoom(clientID: UUID, data: HelloMessage) {
+        connectOrCreateRoom(clientID, data)
+    }
+
+    private fun createRoom(clientID: UUID, data: HelloMessage) {
+        val roomID = UUID.randomUUID()
+        roomRegister.register(roomID, publish, executor)
+        val room = roomRegister[roomID]
+        if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
+            clientsInRoom[clientID] = roomID
         }
+    }
+
+    private fun connectOrCreateRoom(clientID: UUID, data: HelloMessage) {
+        val rooms = clientsInRoom.values.toSet()
+        rooms.forEach { roomID ->
+            val room = roomRegister[roomID]
+            if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
+                clientsInRoom[clientID] = roomID
+                return
+            }
+        }
+        createRoom(clientID, data)
     }
 
     /**

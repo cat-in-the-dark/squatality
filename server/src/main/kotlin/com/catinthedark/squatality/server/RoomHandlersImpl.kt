@@ -23,7 +23,7 @@ class RoomHandlersImpl(
     private val executor: IExecutor = SimpleExecutor()
 ) : RoomHandlers {
     private val LOG = LoggerFactory.getLogger(RoomHandlersImpl::class.java)!!
-    private val service: RoomService = RoomService(executor)
+    private val service: RoomService = RoomService(executor, Const.Balance.maxPlayersInRoom)
 
     init {
         executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
@@ -35,13 +35,14 @@ class RoomHandlersImpl(
         service.onMove(msg, clientID)
     }
 
-    override fun onHello(msg: HelloMessage, clientID: UUID) {
-        val id = service.onNewClient(msg, clientID) ?: return
+    override fun onHello(msg: HelloMessage, clientID: UUID): UUID? {
+        val id = service.onNewClient(msg, clientID) ?: return null
         val gsm = service.buildGameStateModel()
         publish(GameStartedMessage(id, gsm), clientID)
         service.playersExcept(id).forEach {
             publish(EnemyConnectedMessage(id), it)
         }
+        return id
     }
 
     override fun onThrowBrick(msg: ThrowBrickMessage, clientID: UUID) {

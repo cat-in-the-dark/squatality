@@ -15,7 +15,8 @@ import java.util.concurrent.TimeUnit
  * So we do not need synchronized and concurrent collections any more.
  */
 class RoomService(
-    private val executor: IExecutor
+    private val executor: IExecutor,
+    private val maxPlayers: Int
 ) {
     private val logger = LoggerFactory.getLogger(RoomService::class.java)!!
     private val players: MutableMap<UUID, Player> = hashMapOf()
@@ -35,6 +36,7 @@ class RoomService(
     }
 
     fun onNewClient(msg: HelloMessage, clientID: UUID): UUID? {
+        logger.info("onNewClient: $msg; playersInRoom: ${players.size}")
         if (hasFreePlace()) {
             val pos = Const.Balance.randomSpawn()
             val player = Player(PlayerModel(
@@ -148,7 +150,7 @@ class RoomService(
     }
 
     fun hasFreePlace(): Boolean {
-        return true
+        return players.size < maxPlayers
     }
 
     fun shouldStop(): Boolean {
