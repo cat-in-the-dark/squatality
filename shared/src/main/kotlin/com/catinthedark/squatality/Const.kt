@@ -26,7 +26,7 @@ object Const {
     }
 
     object Balance {
-        val maxPlayersInRoom = 10
+        val maxPlayersInRoom = 6
         val hatRadius = 20f
         val roundTime: Long = 120 * 1000 // milliseconds
         val shootRageSpeed = 0.5f

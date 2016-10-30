@@ -2,7 +2,6 @@ package com.catinthedark.squatality.server
 
 import com.catinthedark.lib.IExecutor
 import com.catinthedark.lib.IMessage
-import com.catinthedark.lib.SimpleExecutor
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import org.slf4j.LoggerFactory
@@ -18,16 +17,18 @@ import java.util.concurrent.TimeUnit
  */
 class RoomHandlersImpl(
     val roomID: UUID,
-    val roomRegister: RoomRegister,
-    private val publish: (IMessage, UUID) -> Unit,
-    private val executor: IExecutor = SimpleExecutor()
+    private val unregister: () -> Unit,
+    private val publish: (IMessage, UUID) -> Unit
 ) : RoomHandlers {
     private val LOG = LoggerFactory.getLogger(RoomHandlersImpl::class.java)!!
-    private val service: RoomService = RoomService(executor, Const.Balance.maxPlayersInRoom)
+    private lateinit var executor: IExecutor
+    private lateinit var service: RoomService
 
-    init {
-        executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
-            roomRegister[roomID]?.invoke(RoomHandlers::onSpawnBonus)
+    fun onCreated(executor: IExecutor) {
+        this.executor = executor
+        service = RoomService(executor, Const.Balance.maxPlayersInRoom)
+        this.executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
+            onSpawnBonus()
         })
     }
 
@@ -56,7 +57,7 @@ class RoomHandlersImpl(
             publish(EnemyDisconnectedMessage(clientID), it)
         }
         if (service.shouldStop()) {
-            roomRegister.unregister(roomID)
+            unregister()
         }
     }
 
@@ -66,7 +67,7 @@ class RoomHandlersImpl(
             val gmm = GameStateMessage(state.second)
             publish(gmm, state.first)
         }
-        while(service.output.isNotEmpty()) {
+        while (service.output.isNotEmpty()) {
             val msg = service.output.poll()
             msg.to.forEach { publish(msg.body, it) }
         }
@@ -74,5 +75,9 @@ class RoomHandlersImpl(
 
     override fun onSpawnBonus() {
         service.onSpawnBonus()
+    }
+
+    override fun onFunc(func: () -> Unit) {
+        func()
     }
 }

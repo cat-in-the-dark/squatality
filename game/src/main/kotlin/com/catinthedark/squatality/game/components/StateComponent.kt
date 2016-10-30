@@ -8,7 +8,7 @@ data class StateComponent(
     var state: String? = null,
     var hasBrick: Boolean = false,
     var bonuses: List<String> = emptyList()
-): Component, Pool.Poolable {
+) : Component, Pool.Poolable {
     override fun reset() {
         time = 0f
         state = null

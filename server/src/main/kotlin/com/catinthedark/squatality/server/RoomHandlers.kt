@@ -2,6 +2,7 @@ package com.catinthedark.squatality.server
 
 import com.catinthedark.squatality.models.HelloMessage
 import com.catinthedark.squatality.models.MoveMessage
+import com.catinthedark.squatality.models.State
 import com.catinthedark.squatality.models.ThrowBrickMessage
 import java.util.*
 
@@ -17,4 +18,5 @@ interface RoomHandlers {
     fun onDisconnect(clientID: UUID)
     fun onTick(deltaTime: Long)
     fun onSpawnBonus()
+    fun onFunc(func: () -> Unit)
 }

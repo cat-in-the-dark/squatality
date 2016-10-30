@@ -1,11 +1,12 @@
 package com.catinthedark.squatality.server
 
-import com.catinthedark.lib.IExecutor
 import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.invoker.InvokeService
 import com.catinthedark.lib.invoker.InvokeWrapper
+import com.catinthedark.squatality.server.lib.RoomHandlerExecutor
 import org.slf4j.LoggerFactory
 import java.util.*
+import java.util.concurrent.ScheduledExecutorService
 
 class RoomRegister {
     private val LOG = LoggerFactory.getLogger(RoomRegister::class.java)
@@ -18,8 +19,13 @@ class RoomRegister {
         LOG.info("Rooms online: ${map.size}")
     }
 
-    fun register(id: UUID, publish: (IMessage, UUID) -> Unit, executor: IExecutor) {
-        map[id] = invoker.wrap(RoomHandlersImpl(id, this, publish, executor))
+    fun register(id: UUID, publish: (IMessage, UUID) -> Unit, executor: ScheduledExecutorService) {
+        val roomHandler = RoomHandlersImpl(id, {
+            unregister(id)
+        }, publish)
+        val wrappedRoom = invoker.wrap(roomHandler)
+        roomHandler.onCreated(RoomHandlerExecutor(wrappedRoom, executor))
+        map[id] = wrappedRoom
         LOG.info("RoomHandlers-$id started")
     }
 

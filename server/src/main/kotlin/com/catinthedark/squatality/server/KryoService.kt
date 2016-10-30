@@ -10,6 +10,9 @@ import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
 import org.slf4j.LoggerFactory
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 class KryoService {
@@ -18,7 +21,8 @@ class KryoService {
     private val clientsInRoom: MutableMap<UUID, UUID> = hashMapOf()
     private val server: Server = Server()
     private val roomRegister = RoomRegister()
-    private val executor: IExecutor = SimpleExecutor()
+    private val coreExecutor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+    private val executor: IExecutor = SimpleExecutor(coreExecutor)
     /**
      * We need this to make RoomService unaware of transport system - udp or tcp.
      */
@@ -83,7 +87,7 @@ class KryoService {
 
     private fun createRoom(clientID: UUID, data: HelloMessage) {
         val roomID = UUID.randomUUID()
-        roomRegister.register(roomID, publish, executor)
+        roomRegister.register(roomID, publish, coreExecutor)
         val room = roomRegister[roomID]
         if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
             clientsInRoom[clientID] = roomID

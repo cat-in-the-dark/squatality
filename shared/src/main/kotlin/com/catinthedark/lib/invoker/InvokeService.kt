@@ -1,5 +1,6 @@
 package com.catinthedark.lib.invoker
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -8,7 +9,7 @@ import java.util.concurrent.Executors
  * It means that every wrapped class will be run in a single thread, but InvokeService allocate thread pool.
  */
 class InvokeService(val numThreads: Int = 4) {
-    private val executor = Executors.newFixedThreadPool(numThreads)
+    val executor: ExecutorService = Executors.newFixedThreadPool(numThreads)
     private val queues = 0.until(numThreads).map { InvokeQueue() }
     private var lastIndex = 0
 
