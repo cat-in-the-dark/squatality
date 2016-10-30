@@ -87,9 +87,8 @@ class RoomService(
     }
 
     fun onDisconnect(clientID: UUID): UUID? {
-        logger.info("Disconnected $clientID")
         val playerToRemove = players[clientID]
-        if (playerToRemove != null) {
+        val id = if (playerToRemove != null) {
             if (playerToRemove.model.hasBrick) {
                 bricks += Brick(
                     model = BrickModel(
@@ -104,10 +103,14 @@ class RoomService(
                     initialSpeed = 0f)
             }
             players.remove(clientID)
-            return clientID
+            logger.info("Client $clientID removed from the room")
+            clientID
+        } else {
+            logger.warn("Client $clientID was disconnected, but there is no player with this id. Strange!")
+            null
         }
         logger.info("RoomHandlers size: ${players.size}")
-        return null
+        return id
     }
 
     fun buildGameStateModel(): GameStateModel {
