@@ -17,13 +17,14 @@ before_script:
   - echo y | android-sdk-linux/tools/android --silent update sdk --no-ui --all --filter extra-google-google_play_services
   - echo y | android-sdk-linux/tools/android --silent update sdk --no-ui --all --filter extra-google-m2repository
   - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export GRADLE_USER_HOME=$PWD/.gradle
   - chmod +x ./gradlew
 
 cache:
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
+    - $PWD/android-sdk-linux
+    - $PWD/.gradle/wrapper
+    - $PWD/.gradle/caches
 
 stages:
   - build
@@ -40,7 +41,7 @@ build:
       - android/build/outputs/
       - server/build/libs
       - desktop/build/libs
-  expire_in: 1 week
+    expire_in: 1 week
 
 test:
   stage: test
