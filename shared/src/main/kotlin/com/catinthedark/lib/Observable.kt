@@ -12,4 +12,8 @@ class Observable<T> {
             it.invoke(data)
         }
     }
+
+    fun clear() {
+        observers.clear()
+    }
 }

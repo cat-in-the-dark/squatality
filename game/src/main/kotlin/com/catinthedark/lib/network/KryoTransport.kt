@@ -1,6 +1,8 @@
 package com.catinthedark.lib.network
 
-import com.catinthedark.lib.*
+import com.catinthedark.lib.IMessage
+import com.catinthedark.lib.StraightTransport
+import com.catinthedark.lib.TimeCache
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
@@ -38,6 +40,11 @@ class KryoTransport(
                 }
                 if (data != null) {
                     if (data is FrameworkMessage.Ping) return // skip framework message
+
+                    if (data is FrameworkMessage.KeepAlive) {
+                        this@apply.stop()
+                        return
+                    }
 
                     if (data is IMessage) {
                         onReceive(data)

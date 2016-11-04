@@ -14,7 +14,6 @@ import com.catinthedark.squatality.game.screens.GameScreen
 import com.catinthedark.squatality.game.screens.PairingScreen
 import com.catinthedark.squatality.game.screens.SplashScreen
 import com.catinthedark.squatality.game.screens.TitleScreen
-import java.net.URI
 
 class SquatalityGame(
     private val serverAddress: ConnectionOptions = Const.Network.server
@@ -23,6 +22,7 @@ class SquatalityGame(
 
     private lateinit var stage: Stage
     private lateinit var hudStage: Stage
+    private lateinit var nc: NetworkControl
 
     override fun create() {
         stage = Stage(FillViewport(
@@ -35,7 +35,7 @@ class SquatalityGame(
             Const.Screen.HEIGHT / Const.Screen.ZOOM,
             OrthographicCamera()), SpriteBatch())
 
-        val nc = NetworkControl(serverAddress)
+        nc = NetworkControl(serverAddress)
         val splash = SplashScreen(hudStage)
         val title = TitleScreen(hudStage)
         val pairing = PairingScreen(hudStage, nc)
@@ -66,6 +66,7 @@ class SquatalityGame(
     }
 
     override fun dispose() {
+        nc.dispose()
         super.dispose()
     }
 }

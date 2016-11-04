@@ -3,11 +3,13 @@ package com.catinthedark.squatality.android
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.catinthedark.squatality.game.SquatalityGame
 
 class MainActivity : AndroidApplication() {
+    private var game: SquatalityGame? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -15,7 +17,8 @@ class MainActivity : AndroidApplication() {
             useImmersiveMode = true
             hideStatusBar = true
         }
-        initialize(SquatalityGame(), cfg)
+        game = SquatalityGame()
+        initialize(game, cfg)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -29,5 +32,11 @@ class MainActivity : AndroidApplication() {
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         }
+    }
+
+    override fun onDestroy() {
+        game?.dispose()
+        game = null
+        super.onDestroy()
     }
 }

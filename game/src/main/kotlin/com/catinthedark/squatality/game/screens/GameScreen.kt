@@ -1,16 +1,12 @@
 package com.catinthedark.squatality.game.screens
 
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.EntityListener
-import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.core.PooledEngine
+import com.badlogic.ashley.core.*
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
-import com.catinthedark.squatality.game.components.FollowingTransformComponent
 import com.catinthedark.squatality.game.components.RemoteIDComponent
 import com.catinthedark.squatality.game.components.StateComponent
 import com.catinthedark.squatality.game.components.TransformComponent
@@ -26,8 +22,8 @@ class GameScreen(
     private val hudStage: Stage,
     private val nc: NetworkControl
 ) : YieldUnit<AssetManager, AssetManager> {
-    private val engine = PooledEngine()
-    private lateinit var world: World
+    private var engine: Engine? = null
+    private var world: World? = null
     private lateinit var am: AssetManager
     private val TAG = "GameScreen"
     private var disconnected: Boolean = false
@@ -36,46 +32,49 @@ class GameScreen(
         Gdx.app.log(TAG, "GameScreen started")
         disconnected = false
         am = data
-        world = World(engine, am)
-        engine.addEntity(world.createSync())
+        val e = PooledEngine()
+        engine = e
+        val w = World(e, am)
+        world = w
+        e.addEntity(w.createSync())
 
-        engine.addSystem(RenderingSystem(stage, hudStage))
-        engine.addSystem(AnimationSystem())
-        engine.addSystem(StateSystem())
-        //engine.addSystem(LocalMovementSystem())
+        e.addSystem(RenderingSystem(stage, hudStage))
+        e.addSystem(AnimationSystem())
+        e.addSystem(StateSystem())
+        //e.addSystem(LocalMovementSystem())
         val rss = RemoteSyncSystem(nc.onGameState)
-        engine.addSystem(rss)
+        e.addSystem(rss)
         val ls = LerpSystem()
-        engine.addSystem(ls)
-        engine.addSystem(RemoteMovementSystem(nc.senderUnreliable))
-        engine.addSystem(PlayersSystem())
-        engine.addSystem(BricksSystem(world))
-        engine.addSystem(BonusesSystem(world))
-        engine.addSystem(KnobMovementSystem(hudStage))
-        engine.addSystem(KnobAimSystem(hudStage, nc.sender))
-        engine.addSystem(FollowCameraSystem(stage.camera))
-        engine.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
-        engine.addSystem(ClockSystem(hudStage))
-        engine.addSystem(FollowingTransformSystem())
+        e.addSystem(ls)
+        e.addSystem(RemoteMovementSystem(nc.senderUnreliable))
+        e.addSystem(PlayersSystem())
+        e.addSystem(BricksSystem(w))
+        e.addSystem(BonusesSystem(w))
+        e.addSystem(KnobMovementSystem(hudStage))
+        e.addSystem(KnobAimSystem(hudStage, nc.sender))
+        e.addSystem(FollowCameraSystem(stage.camera))
+        e.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
+        e.addSystem(ClockSystem(hudStage))
+        e.addSystem(FollowingTransformSystem())
 
-        engine.addEntity(world.createField())
-        world.createFans().forEach { engine.addEntity(it) }
+        e.addEntity(w.createField())
+        w.createFans().forEach { e.addEntity(it) }
 
         nc.onGameStarted.subscribe { gsm ->
             val enemies = gsm.gameStateModel.players.filter { it.id != gsm.clientId }
             val me = gsm.gameStateModel.players.first { it.id == gsm.clientId }
-            val mainPlayerComponent = world.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
-            engine.addEntity(mainPlayerComponent)
-            engine.addEntity(world.createMovementKnob(30f, 20f, mainPlayerComponent.getComponent(), hudStage))
-            engine.addEntity(world.createAimKnob(1000f, 20f, mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), hudStage))
-            engine.addEntity(world.createCamera(mainPlayerComponent.getComponent()))
+            val mainPlayerComponent = w.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
+            e.addEntity(mainPlayerComponent)
+            e.addEntity(w.createMovementKnob(30f, 20f, mainPlayerComponent.getComponent(), hudStage))
+            e.addEntity(w.createAimKnob(1000f, 20f, mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), mainPlayerComponent.getComponent(), hudStage))
+            e.addEntity(w.createCamera(mainPlayerComponent.getComponent()))
             enemies.forEach { em ->
-                val enemy = world.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
-                engine.addEntity(enemy)
+                val enemy = w.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
+                e.addEntity(enemy)
             }
         }
 
-        engine.addEntityListener(Family.all(RemoteIDComponent::class.java, TransformComponent::class.java, StateComponent::class.java).get(), object : EntityListener {
+        e.addEntityListener(Family.all(RemoteIDComponent::class.java, TransformComponent::class.java, StateComponent::class.java).get(), object : EntityListener {
             override fun entityRemoved(entity: Entity?) {
                 //TODO: should we remove hat entity?
             }
@@ -83,20 +82,20 @@ class GameScreen(
             override fun entityAdded(entity: Entity?) {
                 val tc: TransformComponent = entity?.getComponent() ?: return
                 val sc: StateComponent = entity?.getComponent() ?: return
-                engine.addEntity(world.createHat(tc, sc))
+                e.addEntity(w.createHat(tc, sc))
             }
         })
 
         nc.onEnemyConnected.subscribe {
-            val enemy = world.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
-            engine.addEntity(enemy)
+            val enemy = w.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
+            e.addEntity(enemy)
         }
 
         nc.onEnemyDisconnected.subscribe { msg ->
-            val enemy = engine.getEntitiesFor(Family.all(RemoteIDComponent::class.java).get()).find { e ->
+            val enemy = e.getEntitiesFor(Family.all(RemoteIDComponent::class.java).get()).find { e ->
                 Mappers.remote.id[e].id == msg.clientId
             }
-            engine.removeEntity(enemy)
+            e.removeEntity(enemy)
         }
 
         nc.onDisconnected.subscribe { msg ->
@@ -110,14 +109,17 @@ class GameScreen(
 
     override fun run(delta: Float): AssetManager? {
         if (disconnected) return am
-        engine.update(delta)
+        world?.engine?.update(delta)
         return null
     }
 
     override fun onExit() {
-        engine.removeAllEntities()
+        Gdx.app.log(TAG, "onExit")
+        nc.dispose()
         stage.dispose()
         hudStage.dispose()
-        nc.dispose()
+        world = null
+        engine = null
+        Gdx.app.log(TAG, "exited")
     }
 }

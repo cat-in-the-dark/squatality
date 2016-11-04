@@ -22,15 +22,20 @@ class PairingScreen(
 
     override fun onActivate(data: AssetManager) {
         am = data
-        Thread(nc).start()
+        nc.start()
         nc.onServerHello.subscribe {
             hello = it
+        }
+        nc.onDisconnected.subscribe { msg ->
+            nc.dispose()
+            onActivate(data) // Try again
         }
     }
 
     override fun run(delta: Float): AssetManager? {
         if (hello != null) {
             hello = null
+            nc.clearSubscriptions()
             return am
         }
         stage.batch.managed {

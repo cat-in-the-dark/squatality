@@ -9,7 +9,7 @@ import com.catinthedark.lib.network.KryoTransport
 import com.catinthedark.lib.network.NetworkConnector
 import com.catinthedark.squatality.models.*
 
-class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
+class NetworkControl(serverAddress: ConnectionOptions) {
     val onConnected = Observable<NetworkConnector.ConnectMessage>()
     val onDisconnected = Observable<NetworkConnector.DisconnectMessage>()
     val onServerHello = Observable<ServerHelloMessage>()
@@ -68,7 +68,7 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
         })
     }
 
-    override fun run() {
+    fun start() {
         Gdx.app.log(TAG, "Connecting")
         try {
             transport.connect()
@@ -79,5 +79,16 @@ class NetworkControl(serverAddress: ConnectionOptions) : Runnable {
 
     fun dispose() {
         transport.disconnect()
+        clearSubscriptions()
+    }
+
+    fun clearSubscriptions() {
+        onConnected.clear()
+        onDisconnected.clear()
+        onServerHello.clear()
+        onGameState.clear()
+        onGameStarted.clear()
+        onEnemyConnected.clear()
+        onEnemyDisconnected.clear()
     }
 }

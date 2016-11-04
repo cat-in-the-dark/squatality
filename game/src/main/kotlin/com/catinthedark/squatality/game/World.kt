@@ -5,8 +5,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -22,8 +20,8 @@ import com.catinthedark.squatality.models.State
 import java.util.*
 
 class World(
-    private val engine: Engine,
-    private val am: AssetManager
+    val engine: Engine,
+    val am: AssetManager
 ) {
     /**
      * General unit. Can be either enemy or player.
@@ -127,7 +125,7 @@ class World(
 
     fun createFans(): List<Entity> {
         return listOf(
-            createFan(20f,20f,0f, Assets.GirlFanSkin(am[Assets.Names.FANS]))
+            createFan(20f, 20f, 0f, Assets.GirlFanSkin(am[Assets.Names.FANS]))
         )
     }
 

@@ -12,6 +12,13 @@ class RouteMachine {
         unit.onActivate(data)
     }
 
+    /**
+     * Stops current unit
+     */
+    fun exit() {
+        current.onExit()
+    }
+
     fun run(delta: Float) {
         val data = current.run(delta)
         if (data != null) {
