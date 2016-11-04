@@ -7,9 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
-import com.catinthedark.squatality.game.components.RemoteIDComponent
-import com.catinthedark.squatality.game.components.StateComponent
-import com.catinthedark.squatality.game.components.TransformComponent
+import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
@@ -37,6 +35,8 @@ class GameScreen(
         val w = World(e, am)
         world = w
         e.addEntity(w.createSync())
+        val notificationsEntity = w.createNotifications()
+        e.addEntity(notificationsEntity)
 
         e.addSystem(RenderingSystem(stage, hudStage))
         e.addSystem(AnimationSystem())
@@ -53,9 +53,10 @@ class GameScreen(
         e.addSystem(KnobMovementSystem(hudStage))
         e.addSystem(KnobAimSystem(hudStage, nc.sender))
         e.addSystem(FollowCameraSystem(stage.camera))
-        e.addSystem(PerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
-        e.addSystem(ClockSystem(hudStage))
+        e.addSystem(UIPerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
+        e.addSystem(UIClockSystem(hudStage))
         e.addSystem(FollowingTransformSystem())
+        e.addSystem(UINotificationsSystem(hudStage))
 
         e.addEntity(w.createField())
         w.createFans().forEach { e.addEntity(it) }
@@ -100,6 +101,13 @@ class GameScreen(
 
         nc.onDisconnected.subscribe { msg ->
             disconnected = true
+        }
+
+        nc.onKilled.subscribe { msg ->
+            val component: UINotificationComponent = notificationsEntity.getComponent()
+            component.list.add(Notification(
+                text = "${msg.killerNames.joinToString(", ")} -> ${msg.victimName}")
+            )
         }
 
         Gdx.input.inputProcessor = hudStage

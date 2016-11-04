@@ -17,6 +17,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
     val onGameStarted = Observable<GameStartedMessage>()
     val onEnemyConnected = Observable<EnemyConnectedMessage>()
     val onEnemyDisconnected = Observable<EnemyDisconnectedMessage>()
+    val onKilled = Observable<KillMessage>()
     val sender: (IMessage) -> Unit = {
         messageBus.send(it, true)
     }
@@ -65,6 +66,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
         })
         subscribe(KillMessage::class.java, {
             Gdx.app.log(TAG, "KillMessage $it")
+            onKilled(it)
         })
     }
 

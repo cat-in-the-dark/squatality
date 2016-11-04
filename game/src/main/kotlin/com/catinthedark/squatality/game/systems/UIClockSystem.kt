@@ -1,19 +1,19 @@
 package com.catinthedark.squatality.game.systems
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalSystem
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.catinthedark.squatality.game.Mappers
+import com.catinthedark.squatality.game.components.ClockComponent
 
-class PerformanceSystem(
-    private val hudStage: Stage,
-    private val syncDelta: () -> Long,
-    private val lerpDelay: () -> Long,
-    private val latency: () -> Int
-) : IntervalSystem(0.1f) {
+class UIClockSystem(
+    private val hudStage: Stage
+): IntervalSystem(0.5f) {
+    private val family = Family.all(ClockComponent::class.java).get()
     private val font = BitmapFont()
     private val label = Label(" ", Label.LabelStyle(font, Color.WHITE))
 
@@ -21,6 +21,8 @@ class PerformanceSystem(
         super.addedToEngine(engine)
         label.fontScaleX = 2f
         label.fontScaleY = 2f
+        label.x = 640f
+        label.y = 640f
         hudStage.addActor(label)
     }
 
@@ -30,6 +32,14 @@ class PerformanceSystem(
     }
 
     override fun updateInterval() {
-        label.setText(" FPS: ${Gdx.graphics.framesPerSecond}\t SyncDelta: ${syncDelta()} \tLerpDelay: ${lerpDelay()} \tPing: ${latency()}")
+        val entity = engine.getEntitiesFor(family).firstOrNull() ?: return
+        val cc = Mappers.clock[entity] ?: return
+        label.setText(formatTime(cc.time))
+    }
+
+    private fun formatTime(time: Long): String {
+        val min = time / 60
+        val sec = time % 60
+        return "$min:$sec"
     }
 }

@@ -19,6 +19,7 @@ object Mappers {
     val aim = ComponentMapper.getFor(AimComponent::class.java)!!
     val hurt = ComponentMapper.getFor(HurtComponent::class.java)!!
     val clock = ComponentMapper.getFor(ClockComponent::class.java)!!
+    val notifications = ComponentMapper.getFor(UINotificationComponent::class.java)!!
 
     object remote {
         val transform = ComponentMapper.getFor(RemoteMoveComponent::class.java)!!

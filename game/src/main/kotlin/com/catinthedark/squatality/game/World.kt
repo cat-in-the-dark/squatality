@@ -243,4 +243,12 @@ class World(
             add(bc)
         }
     }
+
+    fun createNotifications(): Entity {
+        return engine.createEntity().apply {
+            val nc: UINotificationComponent = engine.createComponent()
+
+            add(nc)
+        }
+    }
 }
