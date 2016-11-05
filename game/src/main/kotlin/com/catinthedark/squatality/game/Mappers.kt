@@ -31,4 +31,8 @@ object Mappers {
         val bricks = ComponentMapper.getFor(BricksComponent::class.java)!!
         val players = ComponentMapper.getFor(PlayersComponent::class.java)!!
     }
+
+    object ui {
+        val players = ComponentMapper.getFor(PlayersListComponent::class.java)!!
+    }
 }

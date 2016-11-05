@@ -57,6 +57,7 @@ class GameScreen(
         e.addSystem(UIClockSystem(hudStage))
         e.addSystem(FollowingTransformSystem())
         e.addSystem(UINotificationsSystem(hudStage))
+        e.addSystem(UIPlayersListSystem(hudStage, am))
 
         e.addEntity(w.createField())
         w.createFans().forEach { e.addEntity(it) }

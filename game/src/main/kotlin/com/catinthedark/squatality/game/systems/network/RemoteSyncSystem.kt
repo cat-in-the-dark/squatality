@@ -7,6 +7,8 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.catinthedark.lib.Observable
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.ClockComponent
+import com.catinthedark.squatality.game.components.PlayerShortModel
+import com.catinthedark.squatality.game.components.PlayersListComponent
 import com.catinthedark.squatality.game.components.network.BonusesComponent
 import com.catinthedark.squatality.game.components.network.BricksComponent
 import com.catinthedark.squatality.game.components.network.PlayersComponent
@@ -17,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class RemoteSyncSystem(
     private val onGameState: Observable<GameStateModel>
 ) : IteratingSystem(
-    Family.all(BonusesComponent::class.java, BricksComponent::class.java, PlayersComponent::class.java, ClockComponent::class.java).get()
+    Family.all(BonusesComponent::class.java, BricksComponent::class.java, PlayersComponent::class.java, ClockComponent::class.java, PlayersListComponent::class.java).get()
 ) {
     private val gameStates = ConcurrentLinkedQueue<Pair<GameStateModel, Long>>()
     private var syncDelta = 0L
@@ -51,11 +53,15 @@ class RemoteSyncSystem(
                 val bc = Mappers.network.bonuses[entity]
                 val brc = Mappers.network.bricks[entity]
                 val cc = Mappers.clock[entity]
+                val plc = Mappers.ui.players[entity]
                 pc.queue.add(Pair(gs.players, delay))
                 bc.queue.add(Pair(gs.bonuses, delay))
                 brc.queue.add(Pair(gs.bricks, delay))
                 if (gs.time > cc.time) { // udp may receive msg in any order, save the order!
                     cc.time = gs.time
+                }
+                gs.players.forEach {
+                    plc.players[it.id] = PlayerShortModel(it.id, it.name, it.skin, it.bonuses.toList(), it.frags, it.deaths, it.hasBrick)
                 }
             }
         }

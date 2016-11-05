@@ -2,7 +2,6 @@ package com.catinthedark.squatality.game.screens
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
@@ -10,7 +9,7 @@ import com.catinthedark.squatality.game.Assets
 
 class TitleScreen(
     private val stage: Stage
-): YieldUnit<AssetManager, AssetManager> {
+) : YieldUnit<AssetManager, AssetManager> {
     private lateinit var am: AssetManager
 
     private var time = 0f
