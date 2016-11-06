@@ -71,8 +71,8 @@ class World(
             val aimC: AimComponent = engine.createComponent()
             val rmc: RemoteMoveComponent = engine.createComponent()
 
-            mc.acceleration.x = 250f
-            mc.acceleration.y = 250f
+            mc.acceleration.x = Const.Balance.playerSpeed.x
+            mc.acceleration.y = Const.Balance.playerSpeed.y
 
             add(mc)
             add(aimC)

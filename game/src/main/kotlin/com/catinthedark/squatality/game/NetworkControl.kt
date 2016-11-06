@@ -75,6 +75,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
         try {
             transport.connect()
         } catch (e: Exception) {
+            // TODO: schedule reconnection or throw exception so the higher level will decide what to do if network is unreachable
             Gdx.app.log(TAG, e.message, e)
         }
     }

@@ -22,7 +22,6 @@ class PairingScreen(
 
     override fun onActivate(data: AssetManager) {
         am = data
-        nc.start()
         nc.onServerHello.subscribe {
             hello = it
         }
@@ -30,6 +29,7 @@ class PairingScreen(
             nc.dispose()
             onActivate(data) // Try again
         }
+        nc.start()
     }
 
     override fun run(delta: Float): AssetManager? {

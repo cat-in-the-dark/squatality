@@ -32,8 +32,10 @@ object Const {
         val shootRageSpeed = 0.5f
         val maxShootRage = 80f
         val minShootRange = 20f
-        val playerSpeed = 5.0f
-        val playerSpeedBonus = 10.0f
+        val playerSpeed = Vector2(250f, 250f)
+        val playerSpeedMax = Vector2(600f, 600f)
+        val playerAcceleration = 2f
+        val playerSpeedDropAngle = 5f // if player rotates on the angle more than N, we reduce his acceleration
         val playerRadius = 40.0f
         val brickRadius = 10.0f
         val brickFriction = 1f

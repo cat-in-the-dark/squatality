@@ -60,6 +60,7 @@ class GameScreen(
         e.addSystem(FollowingTransformSystem())
         e.addSystem(UINotificationsSystem(hudStage))
         e.addSystem(UIPlayersListSystem(hudStage, am))
+        e.addSystem(LazyAccelerationSystem())
 
         e.addEntity(w.createField())
         w.createFans().forEach { e.addEntity(it) }
