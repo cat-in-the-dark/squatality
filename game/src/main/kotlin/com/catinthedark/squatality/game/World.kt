@@ -190,13 +190,12 @@ class World(
         }
     }
 
-    fun createSync(): Entity {
+    fun createSync(plc: PlayersListComponent): Entity {
         return engine.createEntity().apply {
             val brc: BricksComponent = engine.createComponent()
             val bc: BonusesComponent = engine.createComponent()
             val pc: PlayersComponent = engine.createComponent()
             val cc: ClockComponent = engine.createComponent()
-            val plc: PlayersListComponent = engine.createComponent()
             add(brc)
             add(bc)
             add(pc)

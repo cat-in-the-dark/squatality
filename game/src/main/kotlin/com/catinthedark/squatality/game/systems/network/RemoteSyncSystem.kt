@@ -60,6 +60,7 @@ class RemoteSyncSystem(
                 if (gs.time > cc.time) { // udp may receive msg in any order, save the order!
                     cc.time = gs.time
                 }
+                plc.players.forEach { it.value.isOnline = false }
                 gs.players.forEach {
                     plc.players[it.id] = PlayerShortModel(it.id, it.name, it.skin, it.bonuses.toList(), it.frags, it.deaths, it.hasBrick)
                 }

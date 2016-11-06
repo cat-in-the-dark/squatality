@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
+import com.catinthedark.lib.ashley.createComponent
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
 import com.catinthedark.squatality.game.components.*
@@ -34,7 +35,8 @@ class GameScreen(
         engine = e
         val w = World(e, am)
         world = w
-        e.addEntity(w.createSync())
+        val plc: PlayersListComponent = e.createComponent()
+        e.addEntity(w.createSync(plc))
         val notificationsEntity = w.createNotifications()
         e.addEntity(notificationsEntity)
 
@@ -74,6 +76,7 @@ class GameScreen(
                 val enemy = w.createUnit(em.id, em.x, em.y, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
                 e.addEntity(enemy)
             }
+            plc.meId = me.id
         }
 
         e.addEntityListener(Family.all(RemoteIDComponent::class.java, TransformComponent::class.java, StateComponent::class.java).get(), object : EntityListener {
