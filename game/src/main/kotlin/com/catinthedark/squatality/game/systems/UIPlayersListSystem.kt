@@ -37,6 +37,7 @@ class UIPlayersListSystem(
     private val font = BitmapFont()
     private val style = Label.LabelStyle(font, Color.WHITE)
     private val styleMe = Label.LabelStyle(font, Color.GOLD)
+    private val styleOffline = Label.LabelStyle(font, Color.RED)
     private var isShowing = false // actually system should never handle some global state, but we know, that there is only one players list in the game.
 
     override fun addedToEngine(engine: Engine?) {
@@ -61,10 +62,6 @@ class UIPlayersListSystem(
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         table.reset()
-        table.left()
-        table.top()
-        table.x = 300f
-        table.y = 600f
 
         val plc = Mappers.ui.players[entity] ?: return
         if (isShowing) {
@@ -78,6 +75,10 @@ class UIPlayersListSystem(
         }
 
         table.pack()
+        table.left()
+        table.top()
+        table.x = 300f
+        table.y = 720f - 120f - table.height
     }
 
     override fun removedFromEngine(engine: Engine?) {
@@ -88,8 +89,10 @@ class UIPlayersListSystem(
     private fun row(table: Table, player: PlayerShortModel, plc: PlayersListComponent) {
         val s = if (player.id == plc.meId) {
             styleMe
-        } else {
+        } else if (player.isOnline){
             style
+        } else {
+            styleOffline
         }
         table.add(l(player.name, s)).padLeft(10f)
         table.add(l(player.deaths.toString(), s)).padLeft(20f)
