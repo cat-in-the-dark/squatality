@@ -6,6 +6,7 @@ import com.catinthedark.math.Vector2
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import com.catinthedark.squatality.server.math.IntersectService
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -24,6 +25,10 @@ class RoomService(
     private val bricks: MutableList<Brick> = arrayListOf()
     private var time: Long = 0
     private val intersect = IntersectService()
+    val onlinePlayers: Map<UUID, Player>
+        get() = players.filter { it.value.isOnline }
+    var playing: Boolean = true
+        private set(value) { field = value }
     /**
      * In this queue we can put messages to send them out of system.
      * For example, send some game events, that should not be in the game state.
@@ -32,11 +37,11 @@ class RoomService(
     val output: Queue<Message> = LinkedList()
 
     fun playersExcept(id: UUID): Set<UUID> {
-        return players.filterKeys { it != id }.keys
+        return onlinePlayers.filterKeys { it != id }.keys
     }
 
     fun onNewClient(msg: HelloMessage, clientID: UUID): UUID? {
-        logger.info("onNewClient: $msg; playersInRoom: ${players.size}")
+        logger.info("onNewClient: $msg; playersInRoom: ${onlinePlayers.size}")
         if (hasFreePlace()) {
             val pos = Const.Balance.randomSpawn()
             val player = Player(PlayerModel(
@@ -57,7 +62,7 @@ class RoomService(
     }
 
     fun onMove(msg: MoveMessage, clientID: UUID) {
-        val player = players[clientID] ?: return
+        val player = onlinePlayers[clientID] ?: return
         if (player.model.state != State.KILLED) {
             player.model.x += msg.speedX
             player.model.y += msg.speedY
@@ -68,7 +73,7 @@ class RoomService(
     }
 
     fun onThrowBrick(msg: ThrowBrickMessage, clientID: UUID) {
-        val thrower = players[clientID] ?: return
+        val thrower = onlinePlayers[clientID] ?: return
         if (thrower.model.hasBrick) {
             bricks += Brick(
                 model = BrickModel(
@@ -102,20 +107,20 @@ class RoomService(
                     currentSpeed = 0f,
                     initialSpeed = 0f)
             }
-            players.remove(clientID)
+            playerToRemove.isOnline = false
             logger.info("Client $clientID removed from the room")
             clientID
         } else {
             logger.warn("Client $clientID was disconnected, but there is no player with this id. Strange!")
             null
         }
-        logger.info("RoomHandlers size: ${players.size}")
+        logger.info("RoomHandlers size: ${onlinePlayers.size}")
         return id
     }
 
     fun buildGameStateModel(): GameStateModel {
         return GameStateModel(
-            players = players.values.map { it.model.copy() },
+            players = onlinePlayers.values.map { it.model.copy() },
             bricks = bricks.map { it.model.copy() },
             bonuses = bonuses,
             time = time / 1000
@@ -123,14 +128,14 @@ class RoomService(
     }
 
     fun onTick(delta: Long): List<Pair<UUID, GameStateModel>> {
-        if (players.isEmpty()) return emptyList()
+        if (onlinePlayers.isEmpty()) return emptyList()
         time += delta
         processGameState()
-        val models =  players.map { me ->
+        val models = onlinePlayers.map { me ->
             Pair(me.key, buildGameStateModel())
         }
 
-        players.forEach {
+        onlinePlayers.forEach {
             it.value.model.previousX = it.value.model.x
             it.value.model.previousY = it.value.model.y
             it.value.model.updated = false
@@ -145,7 +150,7 @@ class RoomService(
     }
 
     fun onSpawnBonus() {
-        if (bonuses.size < Const.Balance.bonusesAtOnce && players.size > 1) {
+        if (bonuses.size < Const.Balance.bonusesAtOnce && onlinePlayers.size > 1) {
             val pos = Const.Balance.randomSpawn()
             val typeName = Const.Balance.randomBonus()
             bonuses += BonusModel(UUID.randomUUID(), pos.x, pos.y, typeName)
@@ -153,11 +158,11 @@ class RoomService(
     }
 
     fun hasFreePlace(): Boolean {
-        return players.size < maxPlayers
+        return onlinePlayers.size < maxPlayers
     }
 
-    fun shouldStop(): Boolean {
-        return players.isEmpty()
+    fun isShouldStop(): Boolean {
+        return onlinePlayers.isEmpty() || !playing
     }
 
     private fun spawnBrick(): Brick {
@@ -179,17 +184,38 @@ class RoomService(
         processBricks()
         processPlayers()
         processBonuses()
+        processRoundTime()
+    }
+
+    private fun processRoundTime() {
+        if (time > Const.Balance.roundTime) {
+            playing = false
+            output.add(Message(
+                body = RoundEndsMessage(statistics = RoomStatisticsModel(
+                    players = players.values.map {
+                        ShortPlayerModel(
+                            id = it.model.id,
+                            deaths = it.model.deaths,
+                            frags = it.model.frags,
+                            name = it.model.name,
+                            isOnline = it.isOnline
+                        )
+                    }
+                )),
+                to = onlinePlayers.keys.toList()
+            ))
+        }
     }
 
     private fun processPlayers() {
-        players.forEach { p1 ->
+        onlinePlayers.forEach { p1 ->
             if (p1.value.model.state != State.KILLED) {
                 processPlayersIntersect(p1)
                 processWallsIntersect(p1)
                 processBricksIntersect(p1)
             }
 
-            players.forEach { p ->
+            onlinePlayers.forEach { p ->
                 p.value.model.x += p.value.moveVector.x
                 p.value.model.y += p.value.moveVector.y
                 p.value.moveVector.setZero()
@@ -198,7 +224,7 @@ class RoomService(
     }
 
     private fun processPlayersIntersect(p1: Map.Entry<UUID, Player>) {
-        players.filter { p2 ->
+        onlinePlayers.filter { p2 ->
             p1.key != p2.key
                 && p1.value.intersect(p2.value)
                 && p2.value.model.state != State.KILLED
@@ -255,7 +281,7 @@ class RoomService(
                         victimName = p1.value.model.name,
                         killerIds = killers.map { it.model.id },
                         killerNames = killers.map { it.model.name }
-                    ), players.keys.toList()))
+                    ), onlinePlayers.keys.toList()))
 
                     executor.deffer(2, TimeUnit.SECONDS, {
                         p1.value.model.state = State.IDLE
@@ -269,7 +295,7 @@ class RoomService(
     }
 
     private fun processBonuses() {
-        players.values.forEach { player ->
+        onlinePlayers.values.forEach { player ->
             bonuses.filter {
                 it.typeName == Const.Bonus.hat
             }.forEach { hat ->
@@ -307,7 +333,7 @@ class RoomService(
     }
 
     private fun initializeBricks() {
-        if (players.size <= 1) {
+        if (onlinePlayers.size <= 1) {
             bricks += spawnBrick()
             bricks += spawnBrick()
         }
@@ -322,7 +348,8 @@ class RoomService(
 
     data class Player(
         val model: PlayerModel,
-        val moveVector: Vector2 = Vector2()
+        val moveVector: Vector2 = Vector2(),
+        var isOnline: Boolean = true
     ) {
         val pos: Vector2
             get() = Vector2(model.x, model.y)

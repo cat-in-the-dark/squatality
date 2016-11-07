@@ -24,6 +24,8 @@ object MessageConverter {
             register(BrickModel::class.java)
             register(PlayerModel::class.java)
             register(State::class.java)
+            register(RoomStatisticsModel::class.java)
+            register(ShortPlayerModel::class.java)
         }
     }
 }

@@ -41,3 +41,15 @@ data class BonusModel(
     val x: Float = 0f,
     val y: Float = 0f,
     val typeName: String = "") : Model
+
+data class RoomStatisticsModel(
+    val players: List<ShortPlayerModel> = emptyList()
+) : Model
+
+data class ShortPlayerModel(
+    val id: UUID = UUID.randomUUID(),
+    val name: String = "",
+    val frags: Int = 0,
+    val deaths: Int = 0,
+    val isOnline: Boolean = true
+) : Model

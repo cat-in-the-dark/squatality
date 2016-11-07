@@ -68,6 +68,9 @@ class NetworkControl(serverAddress: ConnectionOptions) {
             Gdx.app.log(TAG, "KillMessage $it")
             onKilled(it)
         })
+        subscribe(RoundEndsMessage::class.java, {
+            Gdx.app.log(TAG, "RoundEndsMessage $it")
+        })
     }
 
     fun start() {

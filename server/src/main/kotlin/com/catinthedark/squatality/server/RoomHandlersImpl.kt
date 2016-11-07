@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit
 class RoomHandlersImpl(
     val roomID: UUID,
     private val unregister: () -> Unit,
-    private val publish: (IMessage, UUID) -> Unit
+    private val publish: (IMessage, UUID) -> Unit,
+    private val disconnect: (UUID) -> Unit
 ) : RoomHandlers {
     private val LOG = LoggerFactory.getLogger(RoomHandlersImpl::class.java)!!
     private lateinit var executor: IExecutor
@@ -56,12 +57,16 @@ class RoomHandlersImpl(
         service.playersExcept(clientID).forEach {
             publish(EnemyDisconnectedMessage(clientID), it)
         }
-        if (service.shouldStop()) {
-            unregister()
-        }
     }
 
     override fun onTick(deltaTime: Long) {
+        if (service.isShouldStop()) {
+            service.onlinePlayers.keys.forEach {
+                disconnect(it)
+            }
+            unregister()
+        }
+
         val states = service.onTick(deltaTime)
         states.forEach { state ->
             val gmm = GameStateMessage(state.second)

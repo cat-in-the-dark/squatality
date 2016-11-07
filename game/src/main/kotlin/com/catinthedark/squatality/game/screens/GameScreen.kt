@@ -127,12 +127,10 @@ class GameScreen(
     }
 
     override fun onExit() {
-        Gdx.app.log(TAG, "onExit")
         nc.dispose()
         stage.dispose()
         hudStage.dispose()
         world = null
         engine = null
-        Gdx.app.log(TAG, "exited")
     }
 }

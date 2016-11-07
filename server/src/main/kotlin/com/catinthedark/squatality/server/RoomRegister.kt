@@ -19,10 +19,10 @@ class RoomRegister {
         LOG.info("Rooms online: ${map.size}")
     }
 
-    fun register(id: UUID, publish: (IMessage, UUID) -> Unit, executor: ScheduledExecutorService) {
+    fun register(id: UUID, publish: (IMessage, UUID) -> Unit, disconnect: (UUID) -> Unit, executor: ScheduledExecutorService) {
         val roomHandler = RoomHandlersImpl(id, {
             unregister(id)
-        }, publish)
+        }, publish, disconnect)
         val wrappedRoom = invoker.wrap(roomHandler)
         roomHandler.onCreated(RoomHandlerExecutor(wrappedRoom, executor))
         map[id] = wrappedRoom

@@ -3,6 +3,7 @@ package com.catinthedark.squatality.server
 import com.catinthedark.lib.IExecutor
 import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.SimpleExecutor
+import com.catinthedark.lib.invoker.InvokeWrapper
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import com.esotericsoftware.kryonet.Connection
@@ -33,8 +34,14 @@ class KryoService {
             is EnemyConnectedMessage -> pushTCP(clientID, msg)
             is EnemyDisconnectedMessage -> pushTCP(clientID, msg)
             is KillMessage -> pushTCP(clientID, msg)
+            is RoundEndsMessage -> pushTCP(clientID, msg)
             else -> logger.warn("Unknown message $msg")
         }
+    }
+
+    private val disconnect: (clientID: UUID) -> Unit = { clientID ->
+        val id = clientIdToUUID.filterValues { it == clientID }.keys.firstOrNull()
+        server.connections.find { it.id == id }?.close()
     }
 
     private val listener = object : Listener() {
@@ -87,7 +94,7 @@ class KryoService {
 
     private fun createRoom(clientID: UUID, data: HelloMessage) {
         val roomID = UUID.randomUUID()
-        roomRegister.register(roomID, publish, coreExecutor)
+        roomRegister.register(roomID, publish, disconnect, coreExecutor)
         val room = roomRegister[roomID]
         if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
             clientsInRoom[clientID] = roomID
