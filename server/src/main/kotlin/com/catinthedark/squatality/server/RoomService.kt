@@ -124,7 +124,7 @@ class RoomService(
             players = onlinePlayers.values.map { it.model.copy() },
             bricks = bricks.map { it.model.copy() },
             bonuses = bonuses,
-            time = time / 1000
+            time = (Const.Balance.roundTime - time) / 1000
         )
     }
 

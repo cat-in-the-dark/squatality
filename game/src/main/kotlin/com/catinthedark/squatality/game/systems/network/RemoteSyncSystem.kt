@@ -57,9 +57,9 @@ class RemoteSyncSystem(
                 pc.queue.add(Pair(gs.players, delay))
                 bc.queue.add(Pair(gs.bonuses, delay))
                 brc.queue.add(Pair(gs.bricks, delay))
-                if (gs.time > cc.time) { // udp may receive msg in any order, save the order!
-                    cc.time = gs.time
-                }
+//                if (gs.time > cc.time) { // udp may receive msg in any order, save the order!
+                    cc.time = gs.time // nevermind, user doesn't notice this
+//                }
                 plc.players.forEach { it.value.isOnline = false }
                 gs.players.forEach {
                     plc.players[it.id] = ShortPlayerModel(it.id, it.name, it.skin, it.bonuses.toList(), it.frags, it.deaths, it.hasBrick)
