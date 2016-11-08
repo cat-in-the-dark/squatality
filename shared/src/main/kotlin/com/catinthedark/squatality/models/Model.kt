@@ -43,13 +43,17 @@ data class BonusModel(
     val typeName: String = "") : Model
 
 data class RoomStatisticsModel(
+    val meId: UUID = UUID.randomUUID(),
     val players: List<ShortPlayerModel> = emptyList()
 ) : Model
 
 data class ShortPlayerModel(
     val id: UUID = UUID.randomUUID(),
     val name: String = "",
-    val frags: Int = 0,
-    val deaths: Int = 0,
-    val isOnline: Boolean = true
+    var skin: String = "",
+    val bonuses: List<String> = listOf(),
+    var frags: Int = 0,
+    var deaths: Int = 0,
+    var hasBrick: Boolean = false,
+    var isOnline: Boolean = true
 ) : Model

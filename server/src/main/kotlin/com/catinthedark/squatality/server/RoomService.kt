@@ -6,7 +6,6 @@ import com.catinthedark.math.Vector2
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
 import com.catinthedark.squatality.server.math.IntersectService
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -28,7 +27,9 @@ class RoomService(
     val onlinePlayers: Map<UUID, Player>
         get() = players.filter { it.value.isOnline }
     var playing: Boolean = true
-        private set(value) { field = value }
+        private set(value) {
+            field = value
+        }
     /**
      * In this queue we can put messages to send them out of system.
      * For example, send some game events, that should not be in the game state.
@@ -190,20 +191,23 @@ class RoomService(
     private fun processRoundTime() {
         if (time > Const.Balance.roundTime) {
             playing = false
-            output.add(Message(
-                body = RoundEndsMessage(statistics = RoomStatisticsModel(
-                    players = players.values.map {
-                        ShortPlayerModel(
-                            id = it.model.id,
-                            deaths = it.model.deaths,
-                            frags = it.model.frags,
-                            name = it.model.name,
-                            isOnline = it.isOnline
-                        )
-                    }
-                )),
-                to = onlinePlayers.keys.toList()
-            ))
+            onlinePlayers.keys.forEach {
+                output.add(Message(
+                    body = RoundEndsMessage(statistics = RoomStatisticsModel(
+                        meId = it,
+                        players = players.values.map {
+                            ShortPlayerModel(
+                                id = it.model.id,
+                                deaths = it.model.deaths,
+                                frags = it.model.frags,
+                                name = it.model.name,
+                                isOnline = it.isOnline
+                            )
+                        }
+                    )),
+                    to = listOf(it)
+                ))
+            }
         }
     }
 

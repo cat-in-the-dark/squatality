@@ -9,23 +9,27 @@ import com.catinthedark.lib.ashley.createComponent
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
 import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.screens.messages.StatsMessage
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
 import com.catinthedark.squatality.game.systems.network.PlayersSystem
 import com.catinthedark.squatality.game.systems.network.RemoteSyncSystem
 import com.catinthedark.squatality.models.HelloMessage
+import com.catinthedark.squatality.models.RoomStatisticsModel
+import java.util.*
 
 class GameScreen(
     private val stage: Stage,
     private val hudStage: Stage,
     private val nc: NetworkControl
-) : YieldUnit<AssetManager, AssetManager> {
+) : YieldUnit<AssetManager, StatsMessage> {
     private var engine: Engine? = null
     private var world: World? = null
     private lateinit var am: AssetManager
     private val TAG = "GameScreen"
     private var disconnected: Boolean = false
+    private var stats: RoomStatisticsModel = RoomStatisticsModel()
 
     override fun onActivate(data: AssetManager) {
         Gdx.app.log(TAG, "GameScreen started")
@@ -106,6 +110,14 @@ class GameScreen(
 
         nc.onDisconnected.subscribe { msg ->
             disconnected = true
+            stats = RoomStatisticsModel(
+                meId = plc.meId ?: UUID.randomUUID(),
+                players = plc.players())
+        }
+
+        nc.onRoundEnds.subscribe { msg ->
+            disconnected = true
+            stats = msg.statistics
         }
 
         nc.onKilled.subscribe { msg ->
@@ -120,8 +132,8 @@ class GameScreen(
         nc.sender(HelloMessage(Const.Names.random()))
     }
 
-    override fun run(delta: Float): AssetManager? {
-        if (disconnected) return am
+    override fun run(delta: Float): StatsMessage? {
+        if (disconnected) return StatsMessage(am, stats)
         world?.engine?.update(delta)
         return null
     }

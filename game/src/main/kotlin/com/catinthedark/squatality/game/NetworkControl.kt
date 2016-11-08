@@ -18,6 +18,8 @@ class NetworkControl(serverAddress: ConnectionOptions) {
     val onEnemyConnected = Observable<EnemyConnectedMessage>()
     val onEnemyDisconnected = Observable<EnemyDisconnectedMessage>()
     val onKilled = Observable<KillMessage>()
+    val onRoundEnds = Observable<RoundEndsMessage>()
+
     val sender: (IMessage) -> Unit = {
         messageBus.send(it, true)
     }
@@ -70,6 +72,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
         })
         subscribe(RoundEndsMessage::class.java, {
             Gdx.app.log(TAG, "RoundEndsMessage $it")
+            onRoundEnds(it)
         })
     }
 
@@ -96,5 +99,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
         onGameStarted.clear()
         onEnemyConnected.clear()
         onEnemyDisconnected.clear()
+        onKilled.clear()
+        onRoundEnds.clear()
     }
 }

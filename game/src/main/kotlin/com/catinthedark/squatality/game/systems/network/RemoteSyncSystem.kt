@@ -7,13 +7,13 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.catinthedark.lib.Observable
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.ClockComponent
-import com.catinthedark.squatality.game.components.PlayerShortModel
 import com.catinthedark.squatality.game.components.PlayersListComponent
 import com.catinthedark.squatality.game.components.network.BonusesComponent
 import com.catinthedark.squatality.game.components.network.BricksComponent
 import com.catinthedark.squatality.game.components.network.PlayersComponent
 import com.catinthedark.squatality.game.utils.TimeConverter
 import com.catinthedark.squatality.models.GameStateModel
+import com.catinthedark.squatality.models.ShortPlayerModel
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class RemoteSyncSystem(
@@ -62,7 +62,7 @@ class RemoteSyncSystem(
                 }
                 plc.players.forEach { it.value.isOnline = false }
                 gs.players.forEach {
-                    plc.players[it.id] = PlayerShortModel(it.id, it.name, it.skin, it.bonuses.toList(), it.frags, it.deaths, it.hasBrick)
+                    plc.players[it.id] = ShortPlayerModel(it.id, it.name, it.skin, it.bonuses.toList(), it.frags, it.deaths, it.hasBrick)
                 }
             }
         }

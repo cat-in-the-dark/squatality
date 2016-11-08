@@ -10,10 +10,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.catinthedark.lib.RouteMachine
 import com.catinthedark.lib.network.ConnectionOptions
-import com.catinthedark.squatality.game.screens.GameScreen
-import com.catinthedark.squatality.game.screens.PairingScreen
-import com.catinthedark.squatality.game.screens.SplashScreen
-import com.catinthedark.squatality.game.screens.TitleScreen
+import com.catinthedark.squatality.game.screens.*
 
 class SquatalityGame(
     private val serverAddress: ConnectionOptions = Const.Network.server
@@ -40,11 +37,13 @@ class SquatalityGame(
         val title = TitleScreen(hudStage)
         val pairing = PairingScreen(hudStage, nc)
         val game = GameScreen(stage, hudStage, nc)
+        val stats = StatsScreen(hudStage)
 
         rm.addRoute(splash, { title })
         rm.addRoute(title, { pairing })
         rm.addRoute(pairing, { game })
-        rm.addRoute(game, { title })
+        rm.addRoute(game, { stats })
+        rm.addRoute(stats, { title })
         rm.start(splash, Unit)
     }
 
