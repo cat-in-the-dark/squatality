@@ -47,7 +47,7 @@ class KnobAimSystem(
         val tp = kc.touchPad ?: return
         val point = Vector2(tp.knobPercentX, tp.knobPercentY)
 
-        if (tp.knobPercentX != 0f || tp.knobPercentY != 0f) {
+        if (tp.isTouched) {
             ac.angle = point.angle() - 90
             ac.aiming = true
             if (sc.hasBrick && sc.state == State.IDLE.name) {
