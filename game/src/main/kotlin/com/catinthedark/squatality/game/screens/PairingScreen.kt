@@ -1,5 +1,6 @@
 package com.catinthedark.squatality.game.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -8,6 +9,8 @@ import com.catinthedark.lib.managed
 import com.catinthedark.squatality.game.Assets
 import com.catinthedark.squatality.game.NetworkControl
 import com.catinthedark.squatality.models.ServerHelloMessage
+import java.util.*
+import kotlin.concurrent.schedule
 
 class PairingScreen(
     private val stage: Stage,
@@ -15,9 +18,11 @@ class PairingScreen(
 ) : YieldUnit<AssetManager, AssetManager> {
     private lateinit var am: AssetManager
     private var hello: ServerHelloMessage? = null
+    private val timer: Timer = Timer(true)
+    private var lastTask: TimerTask? = null
 
     override fun onExit() {
-
+        lastTask?.cancel()
     }
 
     override fun onActivate(data: AssetManager) {
@@ -28,6 +33,13 @@ class PairingScreen(
         nc.onDisconnected.subscribe { msg ->
             nc.dispose()
             onActivate(data) // Try again
+        }
+        nc.onConnectionError.subscribe { err ->
+            Gdx.app.error("PairingScreen", "Connection error: ${err.message}")
+            lastTask = timer.schedule(1000L, {
+                Gdx.app.log("PairingScreen", "Reconnecting")
+                nc.start()
+            })
         }
         nc.start()
     }

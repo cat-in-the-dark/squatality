@@ -77,6 +77,9 @@ class KryoTransport(
         }
     }
 
+    /**
+     * @throws java.io.IOException in case of network problems
+     */
     override fun connect() {
         client.start()
         client.connect(5000, options.host, options.portTcp, options.portUdp)
