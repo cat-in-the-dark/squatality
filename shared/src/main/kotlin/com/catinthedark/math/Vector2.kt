@@ -7,6 +7,18 @@ data class Vector2(var x: Float = 0f, var y: Float = 0f) {
         return angle
     }
 
+    fun angle(reference: Vector2): Float {
+        return Math.atan2(crs(reference).toDouble(), dot(reference).toDouble()).toFloat() * MathUtils.radiansToDegrees
+    }
+
+    fun crs(v: Vector2): Float {
+        return this.x * v.y - this.y * v.x
+    }
+
+    fun dot(v: Vector2): Float {
+        return x * v.x + y * v.y
+    }
+
     fun dst(v: Vector2): Float {
         val x_d = v.x - x
         val y_d = v.y - y

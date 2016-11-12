@@ -258,11 +258,24 @@ class RoomService(
                 brick.model.hurting
             }
             if (killerBricks.isNotEmpty()) {
+                killerBricks.forEach { br ->
+                    val intersectVector = p1.value.pos.sub(Vector2(br.model.x, br.model.y))
+                    val brickVector = Vector2(br.model.x, br.model.y).sub(Vector2(br.model.previousX, br.model.previousY))
+                    var angleDifference = intersectVector.angle(brickVector)
+                    if (angleDifference > 180) {
+                        angleDifference -= 360
+                    }
+
+                    var reflectedAngleIncrement = 180.0f - 2 * Math.abs(angleDifference)
+                    if (angleDifference < 0) {
+                        reflectedAngleIncrement *= -1
+                    }
+
+                    br.model.angle += reflectedAngleIncrement
+                }
+
                 if (p1.value.model.bonuses.isNotEmpty()) {
                     p1.value.model.bonuses.clear()
-                    killerBricks.forEach { brick ->
-                        brick.model.angle += 180.0f
-                    }
                 } else {
                     p1.value.model.state = State.KILLED
                     p1.value.model.deaths += 1
