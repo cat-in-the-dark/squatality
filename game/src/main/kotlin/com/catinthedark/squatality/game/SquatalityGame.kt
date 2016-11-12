@@ -40,12 +40,19 @@ class SquatalityGame(
         val splash = SplashScreen(hudStage, soundService)
         val title = TitleScreen(hudStage)
         val pairing = PairingScreen(hudStage, nc)
+        val versionProblem = VersionProblemScreen(hudStage)
         val game = GameScreen(stage, hudStage, nc, ger)
         val stats = StatsScreen(hudStage)
 
         rm.addRoute(splash, { title })
         rm.addRoute(title, { pairing })
-        rm.addRoute(pairing, { game })
+        rm.addRoute(pairing, {
+            if (it.mismatch) {
+                versionProblem
+            } else {
+                game
+            }
+        })
         rm.addRoute(game, { stats })
         rm.addRoute(stats, { title })
         rm.start(splash, Unit)

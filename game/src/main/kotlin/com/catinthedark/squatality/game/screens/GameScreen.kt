@@ -9,6 +9,7 @@ import com.catinthedark.lib.ashley.createComponent
 import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
 import com.catinthedark.squatality.game.components.*
+import com.catinthedark.squatality.game.screens.messages.PairingMessage
 import com.catinthedark.squatality.game.screens.messages.StatsMessage
 import com.catinthedark.squatality.game.services.*
 import com.catinthedark.squatality.game.systems.*
@@ -25,7 +26,7 @@ class GameScreen(
     private val hudStage: Stage,
     private val nc: NetworkControl,
     private val ger: GameEventsRegistrar
-) : YieldUnit<AssetManager, StatsMessage> {
+) : YieldUnit<PairingMessage, StatsMessage> {
     private var engine: Engine? = null
     private var world: World? = null
     private lateinit var am: AssetManager
@@ -33,10 +34,10 @@ class GameScreen(
     private var disconnected: Boolean = false
     private var stats: RoomStatisticsModel = RoomStatisticsModel()
 
-    override fun onActivate(data: AssetManager) {
+    override fun onActivate(data: PairingMessage) {
         Gdx.app.log(TAG, "GameScreen started")
         disconnected = false
-        am = data
+        am = data.am
         val e = PooledEngine()
         engine = e
         val w = World(e, am)

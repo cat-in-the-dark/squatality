@@ -11,7 +11,7 @@ import com.catinthedark.lib.AnimationUtils
 object Assets {
     fun load(): AssetManager {
         return AssetManager().apply {
-            val textures = listOf("logo.png", "pairing.png", "brick.png", "gop_black.png", "gop_red.png", "fans.png", "gop_blue.png", "gopofon.png", "menu.png", "gop_green.png", "kepa.png", "title.png", "touchBackground.png", "touchKnob.png", "view_list_btn.png")
+            val textures = listOf("logo.png", "pairing.png", "brick.png", "gop_black.png", "gop_red.png", "fans.png", "gop_blue.png", "gopofon.png", "menu.png", "gop_green.png", "kepa.png", "title.png", "touchBackground.png", "touchKnob.png", "view_list_btn.png", "versionError.png")
             val sounds = listOf(Names.Sound.MUSIC, Names.Sound.KILL, Names.Sound.THROW)
 
             load("fonts/tahoma-10.fnt", BitmapFont::class.java)
@@ -32,6 +32,7 @@ object Assets {
         val BRICK = "textures/brick.png"
         val BONUS = "textures/kepa.png"
         val FANS = "textures/fans.png"
+        val VERSION_ERROR = "textures/versionError.png"
 
         object Player {
             val RED = "textures/gop_red.png"

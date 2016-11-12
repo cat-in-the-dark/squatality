@@ -8,14 +8,16 @@ import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
 import com.catinthedark.squatality.game.Assets
 import com.catinthedark.squatality.game.NetworkControl
+import com.catinthedark.squatality.game.screens.messages.PairingMessage
 import com.catinthedark.squatality.models.ServerHelloMessage
+import com.catinthedark.squatality.models.VERSION
 import java.util.*
 import kotlin.concurrent.schedule
 
 class PairingScreen(
     private val stage: Stage,
     private val nc: NetworkControl
-) : YieldUnit<AssetManager, AssetManager> {
+) : YieldUnit<AssetManager, PairingMessage> {
     private lateinit var am: AssetManager
     private var hello: ServerHelloMessage? = null
     private val timer: Timer = Timer(true)
@@ -44,11 +46,17 @@ class PairingScreen(
         nc.start()
     }
 
-    override fun run(delta: Float): AssetManager? {
+    override fun run(delta: Float): PairingMessage? {
         if (hello != null) {
-            hello = null
+            val v = hello?.version
             nc.clearSubscriptions()
-            return am
+            hello = null
+
+            if (v != VERSION) {
+                return PairingMessage(am, true)
+            } else {
+                return PairingMessage(am, false)
+            }
         }
         stage.batch.managed {
             it.draw(am.get(Assets.Names.PAIRING, Texture::class.java), 0f, 0f)

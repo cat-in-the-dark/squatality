@@ -7,3 +7,8 @@ data class StatsMessage(
     val am: AssetManager,
     val stats: RoomStatisticsModel
 )
+
+data class PairingMessage(
+    val am: AssetManager,
+    val mismatch: Boolean = false
+)
