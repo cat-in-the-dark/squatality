@@ -1,5 +1,6 @@
 package com.catinthedark.squatality.server.spy
 
+import com.catinthedark.squatality.server.spy.entities.GeoEntity
 import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
@@ -13,20 +14,20 @@ import java.util.concurrent.TimeUnit
  */
 class GeoIPService(
     private val gson: Gson = Gson(),
-    private val client: OkHttpClient = OkHttpClient()
+    private val client: OkHttpClient = OkHttpClient(),
+    private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(4)
 ) {
     private val host = "http://ip-api.com/json/"
-    private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(4)
 
-    fun find(ip: String): CompletableFuture<GeoModel> {
-        val future: CompletableFuture<GeoModel> = CompletableFuture()
+    fun find(ip: String): CompletableFuture<GeoEntity> {
+        val future: CompletableFuture<GeoEntity> = CompletableFuture()
         val url = "$host$ip"
         val req = Request.Builder().url(url).build()
         doRequest(req, future)
         return future
     }
 
-    private fun doRequest(req: Request, future: CompletableFuture<GeoModel>, tries: Int = 0) {
+    private fun doRequest(req: Request, future: CompletableFuture<GeoEntity>, tries: Int = 0) {
         if (tries > 10) {
             future.completeExceptionally(Exception("Exceeded max tries of 10"))
             return
@@ -42,7 +43,7 @@ class GeoIPService(
                     if (response.isSuccessful) {
                         try {
                             val json = response.body().string()
-                            val body = gson.fromJson(json, GeoModel::class.java)
+                            val body = gson.fromJson(json, GeoEntity::class.java)
                             future.complete(body)
                         } catch (e: Exception) {
                             doRequest(req, future, tries + 1)
@@ -62,20 +63,3 @@ class GeoIPService(
         return (Math.pow(2.0, n.toDouble()) - 1).toLong()
     }
 }
-
-data class GeoModel(
-    val status: String? = "",
-    val country: String? = "",
-    val countryCode: String? = "",
-    val region: String? = "",
-    val regionName: String? = "",
-    val city: String? = "",
-    val zip: String? = "",
-    val lat: Double? = 0.0,
-    val lon: Double? = 0.0,
-    val timezone: String? = "",
-    val isp: String? = "",
-    val org: String? = "",
-    val `as`: String? = "",
-    val query: String? = ""
-)
