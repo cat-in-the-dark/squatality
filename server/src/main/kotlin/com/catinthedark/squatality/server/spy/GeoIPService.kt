@@ -45,7 +45,7 @@ class GeoIPService(
                             val body = gson.fromJson(json, GeoModel::class.java)
                             future.complete(body)
                         } catch (e: Exception) {
-                            future.completeExceptionally(e)
+                            doRequest(req, future, tries + 1)
                         }
                     } else {
                         doRequest(req, future, tries + 1)
