@@ -8,9 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.catinthedark.lib.YieldUnit
 import com.catinthedark.lib.managed
 import com.catinthedark.squatality.game.Assets
+import com.catinthedark.squatality.game.services.SoundService
 
 class SplashScreen(
-    private val stage: Stage
+    private val stage: Stage,
+    private val soundService: SoundService
 ): YieldUnit<Unit, AssetManager> {
     lateinit var am: AssetManager
 
@@ -20,6 +22,7 @@ class SplashScreen(
 
     override fun run(delta: Float): AssetManager? {
         if (am.update()) {
+            soundService.register(am)
             return am
         } else {
             Gdx.app.log("SplashScreen", "Loading assets...${am.progress}")

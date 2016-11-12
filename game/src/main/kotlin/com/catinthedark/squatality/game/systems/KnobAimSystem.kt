@@ -15,12 +15,15 @@ import com.catinthedark.squatality.game.components.AimComponent
 import com.catinthedark.squatality.game.components.KnobComponent
 import com.catinthedark.squatality.game.components.StateComponent
 import com.catinthedark.squatality.game.components.TransformComponent
+import com.catinthedark.squatality.game.services.GameEventsRegistrar
+import com.catinthedark.squatality.game.services.ThrowBrickEvent
 import com.catinthedark.squatality.models.State
 import com.catinthedark.squatality.models.ThrowBrickMessage
 
 class KnobAimSystem(
     private val hudStage: Stage,
-    private val send: (IMessage) -> Unit
+    private val send: (IMessage) -> Unit,
+    private val ger: GameEventsRegistrar
 ) : IteratingSystem(
     Family.all(KnobComponent::class.java, AimComponent::class.java, StateComponent::class.java, TransformComponent::class.java).get()
 ) {
@@ -74,6 +77,7 @@ class KnobAimSystem(
         val a = Math.toRadians(angle.toDouble())
         val brickX = pos.x - d * Math.sin(a).toFloat()
         val brickY = pos.y + d * Math.cos(a).toFloat()
+        ger.onThrowBrickEvent(ThrowBrickEvent())
         send(ThrowBrickMessage(brickX, brickY, force, angle.toDouble()))
     }
 }

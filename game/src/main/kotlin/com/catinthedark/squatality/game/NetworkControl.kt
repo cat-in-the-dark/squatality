@@ -1,6 +1,7 @@
 package com.catinthedark.squatality.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.Disposable
 import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.MessageBus
 import com.catinthedark.lib.Observable
@@ -9,7 +10,7 @@ import com.catinthedark.lib.network.KryoTransport
 import com.catinthedark.lib.network.NetworkConnector
 import com.catinthedark.squatality.models.*
 
-class NetworkControl(serverAddress: ConnectionOptions) {
+class NetworkControl(serverAddress: ConnectionOptions) : Disposable {
     val onConnectionError = Observable<Throwable>()
     val onConnected = Observable<NetworkConnector.ConnectMessage>()
     val onDisconnected = Observable<NetworkConnector.DisconnectMessage>()
@@ -86,7 +87,7 @@ class NetworkControl(serverAddress: ConnectionOptions) {
         }
     }
 
-    fun dispose() {
+    override fun dispose() {
         transport.disconnect()
         clearSubscriptions()
     }

@@ -10,6 +10,7 @@ import com.catinthedark.lib.ashley.getComponent
 import com.catinthedark.squatality.game.*
 import com.catinthedark.squatality.game.components.*
 import com.catinthedark.squatality.game.screens.messages.StatsMessage
+import com.catinthedark.squatality.game.services.*
 import com.catinthedark.squatality.game.systems.*
 import com.catinthedark.squatality.game.systems.network.BonusesSystem
 import com.catinthedark.squatality.game.systems.network.BricksSystem
@@ -22,7 +23,8 @@ import java.util.*
 class GameScreen(
     private val stage: Stage,
     private val hudStage: Stage,
-    private val nc: NetworkControl
+    private val nc: NetworkControl,
+    private val ger: GameEventsRegistrar
 ) : YieldUnit<AssetManager, StatsMessage> {
     private var engine: Engine? = null
     private var world: World? = null
@@ -55,9 +57,9 @@ class GameScreen(
         e.addSystem(RemoteMovementSystem(nc.senderUnreliable))
         e.addSystem(PlayersSystem())
         e.addSystem(BricksSystem(w))
-        e.addSystem(BonusesSystem(w))
+        e.addSystem(BonusesSystem(w, ger))
         e.addSystem(KnobMovementSystem(hudStage))
-        e.addSystem(KnobAimSystem(hudStage, nc.sender))
+        e.addSystem(KnobAimSystem(hudStage, nc.sender, ger))
         e.addSystem(FollowCameraSystem(stage.camera))
         e.addSystem(UIPerformanceSystem(hudStage, rss.getSyncDelta, ls.getLerpDelay, nc.latency))
         e.addSystem(UIClockSystem(hudStage))
@@ -70,6 +72,7 @@ class GameScreen(
         w.createFans().forEach { e.addEntity(it) }
 
         nc.onGameStarted.subscribe { gsm ->
+            ger.onRoundStartedEvent(RoundStartedEvent())
             val enemies = gsm.gameStateModel.players.filter { it.id != gsm.clientId }
             val me = gsm.gameStateModel.players.first { it.id == gsm.clientId }
             val mainPlayerComponent = w.createPlayer(me.id, me.x, me.y, Assets.PlayerSkin(am.get(Assets.Names.Player.BLUE)))
@@ -97,11 +100,13 @@ class GameScreen(
         })
 
         nc.onEnemyConnected.subscribe {
+            ger.onEnemyConnectedEvent(EnemyConnectedEvent())
             val enemy = w.createUnit(it.clientId, 0f, 0f, Assets.PlayerSkin(am.get(Assets.Names.Player.RED)))
             e.addEntity(enemy)
         }
 
         nc.onEnemyDisconnected.subscribe { msg ->
+            ger.onEnemyDisconnectedEvent(EnemyDisconnectedEvent())
             val enemy = e.getEntitiesFor(Family.all(RemoteIDComponent::class.java).get()).find { e ->
                 Mappers.remote.id[e].id == msg.clientId
             }
@@ -109,6 +114,7 @@ class GameScreen(
         }
 
         nc.onDisconnected.subscribe { msg ->
+            ger.onDisconnectedEvent(DisconnectedEvent())
             disconnected = true
             stats = RoomStatisticsModel(
                 meId = plc.meId ?: UUID.randomUUID(),
@@ -116,11 +122,15 @@ class GameScreen(
         }
 
         nc.onRoundEnds.subscribe { msg ->
+            ger.onRoundEndedEvent(RoundEndedEvent())
             disconnected = true
             stats = msg.statistics
         }
 
         nc.onKilled.subscribe { msg ->
+            ger.onKilledEvent(KilledEvent())
+
+            // TODO: move it out of here. Should be subscribe to the GameEventsRegistrar
             val component: UINotificationComponent = notificationsEntity.getComponent()
             component.list.add(Notification(
                 text = "${msg.killerNames.joinToString(", ")} -> ${msg.victimName}")

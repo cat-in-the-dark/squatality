@@ -11,10 +11,13 @@ import com.catinthedark.squatality.game.components.RemoteIDComponent
 import com.catinthedark.squatality.game.components.TextureComponent
 import com.catinthedark.squatality.game.components.TransformComponent
 import com.catinthedark.squatality.game.components.network.NetworkComponent
+import com.catinthedark.squatality.game.services.BonusSpawnedEvent
+import com.catinthedark.squatality.game.services.GameEventsRegistrar
 import com.catinthedark.squatality.models.BonusModel
 
 class BonusesSystem(
-    private val world: World
+    private val world: World,
+    private val ger: GameEventsRegistrar
 ) : NetworkSystem<BonusModel>() {
     private val family = Family.all(
         TransformComponent::class.java,
@@ -39,6 +42,7 @@ class BonusesSystem(
         bm.forEach { bonus ->
             if (ids.none { it == bonus.id }) {
                 engine.addEntity(world.createBonus(bonus))
+                ger.onBonusSpawnedEvent(BonusSpawnedEvent())
             }
         }
         ids.forEach { id ->

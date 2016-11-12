@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.catinthedark.lib.RouteMachine
 import com.catinthedark.lib.network.ConnectionOptions
 import com.catinthedark.squatality.game.screens.*
+import com.catinthedark.squatality.game.services.GameEventsRegistrar
+import com.catinthedark.squatality.game.services.SoundService
 
 class SquatalityGame(
     private val serverAddress: ConnectionOptions = Const.Network.server
@@ -20,6 +22,8 @@ class SquatalityGame(
     private lateinit var stage: Stage
     private lateinit var hudStage: Stage
     private lateinit var nc: NetworkControl
+    private val ger = GameEventsRegistrar()
+    private val soundService = SoundService(ger)
 
     override fun create() {
         stage = Stage(FillViewport(
@@ -33,10 +37,10 @@ class SquatalityGame(
             OrthographicCamera()), SpriteBatch())
 
         nc = NetworkControl(serverAddress)
-        val splash = SplashScreen(hudStage)
+        val splash = SplashScreen(hudStage, soundService)
         val title = TitleScreen(hudStage)
         val pairing = PairingScreen(hudStage, nc)
-        val game = GameScreen(stage, hudStage, nc)
+        val game = GameScreen(stage, hudStage, nc, ger)
         val stats = StatsScreen(hudStage)
 
         rm.addRoute(splash, { title })
@@ -66,6 +70,8 @@ class SquatalityGame(
 
     override fun dispose() {
         nc.dispose()
+        ger.dispose()
+        soundService.dispose()
         super.dispose()
     }
 }
