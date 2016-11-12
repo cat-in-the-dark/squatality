@@ -29,7 +29,7 @@ class RemoteMovementSystem(
         rtc.velocity.y += deltaTime * mc.velocity.y
 
         if (ac.aiming) {
-            rtc.angle = ac.angle
+            rtc.angle = ac.angle - 90
         } else if (mc.velocity.x != 0f || mc.velocity.y != 0f) {
             rtc.angle = mc.velocity.angle() - 90
         }
