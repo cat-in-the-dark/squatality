@@ -51,7 +51,7 @@ class KnobAimSystem(
         val point = Vector2(tp.knobPercentX, tp.knobPercentY)
 
         if (tp.isTouched) {
-            ac.angle = point.angle() - 90
+            ac.angle = point.angle()
             ac.aiming = true
             if (sc.hasBrick && sc.state == State.IDLE.name) {
                 if (ac.force < Const.Balance.minShootRange) {
@@ -75,8 +75,8 @@ class KnobAimSystem(
     private fun throwBrick(pos: Vector3, angle: Float, force: Float) {
         val d = Const.Balance.playerRadius + Const.Balance.brickRadius + 5
         val a = Math.toRadians(angle.toDouble())
-        val brickX = pos.x - d * Math.sin(a).toFloat()
-        val brickY = pos.y + d * Math.cos(a).toFloat()
+        val brickX = pos.x + d * Math.cos(a).toFloat()
+        val brickY = pos.y + d * Math.sin(a).toFloat()
         ger.onThrowBrickEvent(ThrowBrickEvent())
         send(ThrowBrickMessage(brickX, brickY, force, angle.toDouble()))
     }

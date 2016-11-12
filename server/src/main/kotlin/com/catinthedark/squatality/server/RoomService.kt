@@ -316,16 +316,16 @@ class RoomService(
             if (intersect.leftWallPenetration(brick.model.x, Const.Balance.brickRadius) > 0
                 || intersect.rightWallPenetration(brick.model.x, Const.Balance.brickRadius) > 0
             ) {
-                brick.model.angle = Vector2(Math.cos(Math.toRadians(brick.model.angle)).toFloat(), -1 * Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
+                brick.model.angle = Vector2(-1 * Math.cos(Math.toRadians(brick.model.angle)).toFloat(), Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
             }
             if (intersect.topWallPenetration(brick.model.y, Const.Balance.brickRadius) > 0
                 || intersect.bottomWallPenetration(brick.model.y, Const.Balance.brickRadius) > 0
             ) {
-                brick.model.angle = Vector2(-1 * Math.cos(Math.toRadians(brick.model.angle)).toFloat(), Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
+                brick.model.angle = Vector2(Math.cos(Math.toRadians(brick.model.angle)).toFloat(), -1 * Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
             }
 
-            brick.model.x -= brick.currentSpeed * Math.sin(Math.toRadians(brick.model.angle)).toFloat()
-            brick.model.y += brick.currentSpeed * Math.cos(Math.toRadians(brick.model.angle)).toFloat()
+            brick.model.x += brick.currentSpeed * Math.cos(Math.toRadians(brick.model.angle)).toFloat()
+            brick.model.y += brick.currentSpeed * Math.sin(Math.toRadians(brick.model.angle)).toFloat()
 
             if (brick.currentSpeed <= 0) {
                 brick.currentSpeed = 0f

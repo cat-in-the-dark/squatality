@@ -18,7 +18,7 @@ class LocalMovementSystem : IteratingSystem(
         tc.pos.x += deltaTime * mc.velocity.x
         tc.pos.y += deltaTime * mc.velocity.y
         if (mc.velocity.x != 0f || mc.velocity.y != 0f) {
-            tc.angle = mc.velocity.angle() - 90
+            tc.angle = mc.velocity.angle()
         }
     }
 }
