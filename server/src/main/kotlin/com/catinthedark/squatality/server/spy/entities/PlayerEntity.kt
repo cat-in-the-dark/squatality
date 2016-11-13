@@ -1,9 +1,7 @@
 package com.catinthedark.squatality.server.spy.entities
 
-import java.util.*
-
 data class PlayerEntity(
-    val id: UUID,
+    val id: String,
     val connectedAt: Long,
     val disconnectedAt: Long?,
     val ip: String?,

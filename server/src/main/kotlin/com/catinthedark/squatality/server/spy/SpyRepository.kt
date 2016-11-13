@@ -2,9 +2,11 @@ package com.catinthedark.squatality.server.spy
 
 import com.catinthedark.squatality.server.spy.entities.PlayerEntity
 import com.catinthedark.squatality.server.spy.entities.RoomEntity
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.database.FirebaseDatabase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 /**
  * Service to store all users' data in the DB.
@@ -14,12 +16,29 @@ import java.util.*
 class SpyRepository() {
     private val log: Logger = LoggerFactory.getLogger(SpyRepository::class.java)
 
-    fun save(room: RoomEntity) {
-        log.info("Will save $room")
+    fun register() {
+        val options = FirebaseOptions.Builder()
+            .setServiceAccount(ClassLoader.getSystemResourceAsStream("firebase_key.json"))
+            .setDatabaseUrl("https://squatality-11624608.firebaseio.com")
+            .build()
+
+        FirebaseApp.initializeApp(options)
     }
 
-    fun updatePlayer(player: PlayerEntity, roomId: UUID) {
+    fun save(room: RoomEntity) {
+        log.info("Will save $room")
+        val db = FirebaseDatabase.getInstance()
+        val ref = db.getReference("server")
+        val roomRef = ref.child("rooms")
+        roomRef.child(room.id).setValue(room)
+    }
+
+    fun updatePlayer(player: PlayerEntity, roomId: String) {
         log.info("Will update player $player in room $roomId")
+        val db = FirebaseDatabase.getInstance()
+        val ref = db.getReference("server")
+        val userRef = ref.child("rooms/$roomId/players/")
+        userRef.child(player.id).setValue(player)
     }
 
     fun updateRoom(room: RoomEntity) {

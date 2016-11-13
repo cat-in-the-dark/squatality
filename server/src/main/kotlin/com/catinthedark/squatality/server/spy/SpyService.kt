@@ -16,16 +16,17 @@ class SpyService(
     private lateinit var onRoundEndsId: UUID
 
     fun register() {
+        repository.register()
         onRoundEndsId = ger.onRoundEnds.subscribe { e ->
             log.info("EVENT $e")
             val roomEntity = RoomEntity(
-                id = e.roomId,
+                id = e.roomId.toString(),
                 type = e.type,
                 startedAt = e.startedAt,
                 finishedAt = e.finishedAt,
                 players = e.players.map { p ->
-                    PlayerEntity(
-                        id = p.model.id,
+                    Pair(p.model.id.toString(), PlayerEntity(
+                        id = p.model.id.toString(),
                         connectedAt = p.connectedAt,
                         deaths = p.model.deaths,
                         frags = p.model.frags,
@@ -33,11 +34,11 @@ class SpyService(
                         geo = null,
                         ip = p.address,
                         name = p.model.name
-                    )
-                }
+                    ))
+                }.toMap()
             )
             repository.save(roomEntity)
-            roomEntity.players.forEach { p ->
+            roomEntity.players.values.forEach { p ->
                 if (p.ip == null) return@forEach
                 geoIPService.find(p.ip).handleAsync { geoEntity, throwable ->
                     if (geoEntity != null) {
