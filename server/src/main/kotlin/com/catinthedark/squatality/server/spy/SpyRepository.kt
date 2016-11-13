@@ -26,7 +26,6 @@ class SpyRepository() {
     }
 
     fun save(room: RoomEntity) {
-        log.info("Will save $room")
         val db = FirebaseDatabase.getInstance()
         val ref = db.getReference("server")
         val roomRef = ref.child("rooms")
@@ -34,7 +33,6 @@ class SpyRepository() {
     }
 
     fun updatePlayer(player: PlayerEntity, roomId: String) {
-        log.info("Will update player $player in room $roomId")
         val db = FirebaseDatabase.getInstance()
         val ref = db.getReference("server")
         val userRef = ref.child("rooms/$roomId/players/")

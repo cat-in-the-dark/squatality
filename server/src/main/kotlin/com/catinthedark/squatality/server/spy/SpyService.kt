@@ -18,7 +18,6 @@ class SpyService(
     fun register() {
         repository.register()
         onRoundEndsId = ger.onRoundEnds.subscribe { e ->
-            log.info("EVENT $e")
             val roomEntity = RoomEntity(
                 id = e.roomId.toString(),
                 type = e.type,
