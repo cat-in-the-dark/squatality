@@ -244,11 +244,10 @@ class RoomService(
     }
 
     private fun processWallsIntersect(p1: Map.Entry<UUID, Player>) {
-        val wallShiftVector = Vector2()
-            .add(intersect.leftWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
-                intersect.topWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
-            .sub(intersect.rightWallPenetration(p1.value.model.x + p1.value.moveVector.x, Const.Balance.playerRadius),
-                intersect.bottomWallPenetration(p1.value.model.y + p1.value.moveVector.y, Const.Balance.playerRadius))
+        val wallShiftVector = intersect.wallPenetration(
+            p1.value.model.x + p1.value.moveVector.x,
+            p1.value.model.y + p1.value.moveVector.y,
+            Const.Balance.playerRadius)
 
         p1.value.moveVector.add(wallShiftVector)
     }
@@ -331,26 +330,30 @@ class RoomService(
     }
 
     private fun processBricks() {
-        bricks.forEach { brick ->
-            if (intersect.leftWallPenetration(brick.model.x, Const.Balance.brickRadius) > 0
-                || intersect.rightWallPenetration(brick.model.x, Const.Balance.brickRadius) > 0
-            ) {
-                brick.model.angle = Vector2(-1 * Math.cos(Math.toRadians(brick.model.angle)).toFloat(), Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
-            }
-            if (intersect.topWallPenetration(brick.model.y, Const.Balance.brickRadius) > 0
-                || intersect.bottomWallPenetration(brick.model.y, Const.Balance.brickRadius) > 0
-            ) {
-                brick.model.angle = Vector2(Math.cos(Math.toRadians(brick.model.angle)).toFloat(), -1 * Math.sin(Math.toRadians(brick.model.angle)).toFloat()).angle()
+        bricks.forEach { br ->
+            val v = intersect.wallPenetration(br.model.x, br.model.y, Const.Balance.brickRadius)
+            if (v.x != 0f) {
+                br.model.angle = Vector2(
+                    -1 * Math.cos(Math.toRadians(br.model.angle)).toFloat(),
+                    Math.sin(Math.toRadians(br.model.angle)).toFloat()
+                ).angle()
             }
 
-            brick.model.x += brick.currentSpeed * Math.cos(Math.toRadians(brick.model.angle)).toFloat()
-            brick.model.y += brick.currentSpeed * Math.sin(Math.toRadians(brick.model.angle)).toFloat()
+            if (v.y != 0f) {
+                br.model.angle = Vector2(
+                    Math.cos(Math.toRadians(br.model.angle)).toFloat(),
+                    -1 * Math.sin(Math.toRadians(br.model.angle)).toFloat()
+                ).angle()
+            }
 
-            if (brick.currentSpeed <= 0) {
-                brick.currentSpeed = 0f
-                brick.model.hurting = false
+            br.model.x += v.x + br.currentSpeed * Math.cos(Math.toRadians(br.model.angle)).toFloat()
+            br.model.y += v.y + br.currentSpeed * Math.sin(Math.toRadians(br.model.angle)).toFloat()
+
+            if (br.currentSpeed <= 0) {
+                br.currentSpeed = 0f
+                br.model.hurting = false
             } else {
-                brick.currentSpeed -= Const.Balance.brickFriction
+                br.currentSpeed -= Const.Balance.brickFriction
             }
         }
     }

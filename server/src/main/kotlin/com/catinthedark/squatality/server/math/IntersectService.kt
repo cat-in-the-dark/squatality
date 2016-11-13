@@ -1,5 +1,6 @@
 package com.catinthedark.squatality.server.math
 
+import com.catinthedark.math.Vector2
 import com.catinthedark.squatality.Const
 
 class IntersectService {
@@ -24,5 +25,10 @@ class IntersectService {
             || bottomWallPenetration(y, radius) > 0
             || leftWallPenetration(x, radius) > 0
             || rightWallPenetration(x, radius) > 0)
+    }
+
+    fun wallPenetration(x: Float, y: Float, radius: Float): Vector2 {
+        return Vector2(leftWallPenetration(x, radius), topWallPenetration(y, radius))
+            .sub(rightWallPenetration(x, radius), bottomWallPenetration(y, radius))
     }
 }
