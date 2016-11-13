@@ -3,6 +3,7 @@ package com.catinthedark.squatality.game.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.Gdx
 import com.catinthedark.squatality.game.Mappers
 import com.catinthedark.squatality.game.components.AnimationComponent
 import com.catinthedark.squatality.game.components.StateComponent
@@ -16,7 +17,11 @@ class AnimationSystem: IteratingSystem(
         val anim = Mappers.animation[entity] ?: return
         val state = Mappers.state[entity] ?: return
 
-        val animation = anim.animations[state.animState()] ?: return
+        val animation = anim.animations[state.animState()]
+        if (animation == null) {
+            Gdx.app.error("AnimationSystem", "There is no animation for animState ${state.animState()} of state ${state.state}!")
+            return
+        }
         tex.region = animation.getKeyFrame(state.time)
     }
 }

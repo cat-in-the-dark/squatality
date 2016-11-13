@@ -12,10 +12,6 @@ class StateSystem : IteratingSystem(
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val state = Mappers.state[entity] ?: return
 
-        if (state.state == "RUNNING") {
-            state.time += deltaTime
-        } else {
-            state.time += deltaTime
-        }
+        state.time += deltaTime
     }
 }

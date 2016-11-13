@@ -42,6 +42,7 @@ class World(
             ac.animations[State.THROWING.name] = skin.throwing
             ac.animations["${State.RUNNING.name}_WITH_BRICK"] = skin.runningWithBrick
             ac.animations["${State.IDLE.name}_WITH_BRICK"] = skin.idleWithBrick
+            ac.animations["${State.KILLED.name}_WITH_BRICK"] = skin.killed
             sc.state = State.IDLE.name
 
             tc.centered = true
