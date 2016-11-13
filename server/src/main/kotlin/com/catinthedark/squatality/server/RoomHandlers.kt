@@ -13,7 +13,7 @@ import java.util.*
  */
 interface RoomHandlers {
     fun onMove(msg: MoveMessage, clientID: UUID)
-    fun onHello(msg: HelloMessage, clientID: UUID): UUID?
+    fun onHello(msg: HelloMessage, clientID: UUID, address: String?): UUID?
     fun onThrowBrick(msg: ThrowBrickMessage, clientID: UUID)
     fun onDisconnect(clientID: UUID)
     fun onTick(deltaTime: Long)

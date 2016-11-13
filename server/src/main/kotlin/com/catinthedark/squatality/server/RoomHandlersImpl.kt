@@ -19,11 +19,14 @@ class RoomHandlersImpl(
     val roomID: UUID,
     private val unregister: () -> Unit,
     private val publish: (IMessage, UUID) -> Unit,
-    private val disconnect: (UUID) -> Unit
+    private val disconnect: (UUID) -> Unit,
+    private val ger: ServerGameEventsRegistrar
 ) : RoomHandlers {
     private val LOG = LoggerFactory.getLogger(RoomHandlersImpl::class.java)!!
     private lateinit var executor: IExecutor
     private lateinit var service: RoomService
+    private var startedAt: Long = -1
+    private val roomType = "DeathMatch"
 
     fun onCreated(executor: IExecutor) {
         this.executor = executor
@@ -31,14 +34,15 @@ class RoomHandlersImpl(
         this.executor.periodic(Const.Balance.bonusDelay, TimeUnit.SECONDS, {
             onSpawnBonus()
         })
+        startedAt = Date().time
     }
 
     override fun onMove(msg: MoveMessage, clientID: UUID) {
         service.onMove(msg, clientID)
     }
 
-    override fun onHello(msg: HelloMessage, clientID: UUID): UUID? {
-        val id = service.onNewClient(msg, clientID) ?: return null
+    override fun onHello(msg: HelloMessage, clientID: UUID, address: String?): UUID? {
+        val id = service.onNewClient(msg, clientID, address) ?: return null
         val gsm = service.buildGameStateModel()
         publish(GameStartedMessage(id, gsm), clientID)
         service.playersExcept(id).forEach {
@@ -65,6 +69,12 @@ class RoomHandlersImpl(
                 disconnect(it)
             }
             unregister()
+            ger.onRoundEnds(ServerRoundEndedEvent(
+                players = service.allPlayers.values.toList(),
+                roomId = roomID,
+                startedAt = startedAt,
+                finishedAt = Date().time,
+                type = roomType))
         }
 
         val states = service.onTick(deltaTime)

@@ -1,8 +1,16 @@
 package com.catinthedark.lib
 
 import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
-class Observable<T> : IObservable<T> {
+/**
+ * Use this Observable if you want to invoke callbacks in different threads than main thread.
+ * My be useful to invoke some heavy code that isn't important.
+ */
+class ScheduledObservable<T>(
+    val executor: Executor = Executors.newFixedThreadPool(4)
+) : IObservable<T> {
     private val observers: MutableMap<UUID, (T) -> Unit> = hashMapOf()
 
     override fun subscribe(observer: (T) -> Unit): UUID {
@@ -17,7 +25,9 @@ class Observable<T> : IObservable<T> {
 
     override operator fun invoke(data: T) {
         observers.values.forEach {
-            it.invoke(data)
+            executor.execute {
+                it.invoke(data)
+            }
         }
     }
 

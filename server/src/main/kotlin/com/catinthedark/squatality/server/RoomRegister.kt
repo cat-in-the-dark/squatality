@@ -4,11 +4,15 @@ import com.catinthedark.lib.IMessage
 import com.catinthedark.lib.invoker.InvokeService
 import com.catinthedark.lib.invoker.InvokeWrapper
 import com.catinthedark.squatality.server.lib.RoomHandlerExecutor
+import com.catinthedark.squatality.server.spy.SpyService
 import org.slf4j.LoggerFactory
 import java.util.*
+import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
-class RoomRegister {
+class RoomRegister(
+    private val ger: ServerGameEventsRegistrar
+) {
     private val LOG = LoggerFactory.getLogger(RoomRegister::class.java)
     private val map: MutableMap<UUID, InvokeWrapper<RoomHandlers>> = hashMapOf()
     private val invoker = InvokeService()
@@ -22,7 +26,7 @@ class RoomRegister {
     fun register(id: UUID, publish: (IMessage, UUID) -> Unit, disconnect: (UUID) -> Unit, executor: ScheduledExecutorService) {
         val roomHandler = RoomHandlersImpl(id, {
             unregister(id)
-        }, publish, disconnect)
+        }, publish, disconnect, ger)
         val wrappedRoom = invoker.wrap(roomHandler)
         roomHandler.onCreated(RoomHandlerExecutor(wrappedRoom, executor))
         map[id] = wrappedRoom

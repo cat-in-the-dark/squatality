@@ -24,8 +24,11 @@ class RoomService(
     private val bricks: MutableList<Brick> = arrayListOf()
     private var time: Long = 0
     private val intersect = IntersectService()
+    private var haveEverBeenPlayed: Boolean = false
     val onlinePlayers: Map<UUID, Player>
         get() = players.filter { it.value.isOnline }
+    val allPlayers: Map<UUID, Player>
+        get() = players
     var playing: Boolean = true
         private set(value) {
             field = value
@@ -41,8 +44,8 @@ class RoomService(
         return onlinePlayers.filterKeys { it != id }.keys
     }
 
-    fun onNewClient(msg: HelloMessage, clientID: UUID): UUID? {
-        logger.info("onNewClient: $msg; playersInRoom: ${onlinePlayers.size}")
+    fun onNewClient(msg: HelloMessage, clientID: UUID, address: String?): UUID? {
+        logger.info("onNewClient: $msg from $address; playersInRoom: ${onlinePlayers.size}")
         if (hasFreePlace()) {
             val pos = Const.Balance.randomSpawn()
             val player = Player(PlayerModel(
@@ -54,9 +57,11 @@ class RoomService(
                 y = pos.y,
                 angle = 0f,
                 state = State.IDLE,
-                skin = Const.UI.randomSkin()))
+                skin = Const.UI.randomSkin()
+            ), address = address)
             players[clientID] = player
             initializeBricks()
+            haveEverBeenPlayed = true
             return clientID
         }
         return null
@@ -109,6 +114,7 @@ class RoomService(
                     initialSpeed = 0f)
             }
             playerToRemove.isOnline = false
+            playerToRemove.disconnectedAt = Date().time
             logger.info("Client $clientID removed from the room")
             clientID
         } else {
@@ -163,7 +169,7 @@ class RoomService(
     }
 
     fun isShouldStop(): Boolean {
-        return onlinePlayers.isEmpty() || !playing
+        return haveEverBeenPlayed && (onlinePlayers.isEmpty() || !playing)
     }
 
     private fun spawnBrick(): Brick {
@@ -366,7 +372,10 @@ class RoomService(
     data class Player(
         val model: PlayerModel,
         val moveVector: Vector2 = Vector2(),
-        var isOnline: Boolean = true
+        var isOnline: Boolean = true,
+        val address: String?,
+        val connectedAt: Long = Date().time,
+        var disconnectedAt: Long? = null
     ) {
         val pos: Vector2
             get() = Vector2(model.x, model.y)

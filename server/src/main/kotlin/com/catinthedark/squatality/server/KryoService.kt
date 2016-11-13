@@ -6,22 +6,24 @@ import com.catinthedark.lib.SimpleExecutor
 import com.catinthedark.lib.invoker.InvokeWrapper
 import com.catinthedark.squatality.Const
 import com.catinthedark.squatality.models.*
+import com.catinthedark.squatality.server.spy.SpyService
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
 import org.slf4j.LoggerFactory
+import java.net.InetSocketAddress
 import java.util.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 class KryoService {
     private val logger = LoggerFactory.getLogger(KryoService::class.java)
     private val clientIdToUUID: MutableMap<Int, UUID> = hashMapOf()
     private val clientsInRoom: MutableMap<UUID, UUID> = hashMapOf()
     private val server: Server = Server()
-    private val roomRegister = RoomRegister()
+    private val serviceExecutor: Executor = Executors.newSingleThreadExecutor()
+    private val ger: ServerGameEventsRegistrar = ServerGameEventsRegistrar(serviceExecutor)
+    private val spyService: SpyService = SpyService(ger)
+    private val roomRegister = RoomRegister(ger)
     private val coreExecutor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private val executor: IExecutor = SimpleExecutor(coreExecutor)
     /**
@@ -70,7 +72,7 @@ class KryoService {
                 val clientID = clientIdToUUID[connection.id] ?: return
                 when (data) {
                     is HelloMessage -> {
-                        findOrCreateRoom(clientID, data)
+                        findOrCreateRoom(clientID, data, connection.remoteAddressTCP)
                     }
                     is MoveMessage -> {
                         val room = roomRegister[clientsInRoom[clientID]]
@@ -88,29 +90,29 @@ class KryoService {
         }
     }
 
-    private fun findOrCreateRoom(clientID: UUID, data: HelloMessage) {
-        connectOrCreateRoom(clientID, data)
+    private fun findOrCreateRoom(clientID: UUID, data: HelloMessage, remoteAddressTCP: InetSocketAddress?) {
+        connectOrCreateRoom(clientID, data, remoteAddressTCP?.hostString)
     }
 
-    private fun createRoom(clientID: UUID, data: HelloMessage) {
+    private fun createRoom(clientID: UUID, data: HelloMessage, address: String?) {
         val roomID = UUID.randomUUID()
         roomRegister.register(roomID, publish, disconnect, coreExecutor)
         val room = roomRegister[roomID]
-        if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
+        if (room?.invoke(RoomHandlers::onHello, data, clientID, address)?.get() != null) {
             clientsInRoom[clientID] = roomID
         }
     }
 
-    private fun connectOrCreateRoom(clientID: UUID, data: HelloMessage) {
+    private fun connectOrCreateRoom(clientID: UUID, data: HelloMessage, address: String?) {
         val rooms = clientsInRoom.values.toSet()
         rooms.forEach { roomID ->
             val room = roomRegister[roomID]
-            if (room?.invoke(RoomHandlers::onHello, data, clientID)?.get() != null) {
+            if (room?.invoke(RoomHandlers::onHello, data, clientID, address)?.get() != null) {
                 clientsInRoom[clientID] = roomID
                 return
             }
         }
-        createRoom(clientID, data)
+        createRoom(clientID, data, address)
     }
 
     /**
@@ -155,9 +157,11 @@ class KryoService {
             roomRegister.forEach { it.invoke(RoomHandlers::onTick, delta) }
             lastTick = currentTime
         })
+        spyService.register()
     }
 
     fun stop() {
         server.removeListener(listener)
+        spyService.dispose()
     }
 }
